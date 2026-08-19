@@ -29,61 +29,28 @@ export const Route = createFileRoute("/superintendencia/$id/agentes")({
   component: AgentesPage,
 });
 
-const orbitIcons = [ShieldCheck, Lock, Cloud, Wifi, Settings];
-
 function ResiliaAvatar() {
   return (
-    <div className="relative mx-auto flex size-72 items-center justify-center md:size-80">
+    <div className="relative mx-auto flex size-72 items-center justify-center md:size-96">
       <div
         aria-hidden
-        className="absolute inset-6 rounded-full"
+        className="absolute inset-2 rounded-full blur-2xl"
         style={{
           background:
-            "radial-gradient(circle at 50% 40%, color-mix(in oklab, var(--b3-azul) 45%, transparent), transparent 70%)",
+            "radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--b3-azul) 55%, transparent), transparent 70%)",
         }}
       />
-      <div className="absolute inset-4 rounded-full border border-b3-azul/40" />
       <div className="absolute inset-0 rounded-full border border-dashed border-b3-cinza-azulado/20" />
-      <div className="glass-panel flex size-40 items-center justify-center overflow-hidden rounded-full md:size-44">
-        <svg viewBox="0 0 100 100" className="size-28 text-b3-cinza-azulado" aria-hidden>
-          <g
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="28" y="30" width="44" height="38" rx="12" />
-            <circle cx="41" cy="47" r="4" stroke="var(--b3-turquesa)" />
-            <circle cx="59" cy="47" r="4" stroke="var(--b3-turquesa)" />
-            <path d="M42 59h16" />
-            <path d="M50 30V20" />
-            <circle cx="50" cy="16" r="4" stroke="var(--b3-dourado)" />
-            <path d="M28 44h-7M79 44h-7" />
-            <path d="M38 68v9M62 68v9" />
-          </g>
-        </svg>
-      </div>
-      {orbitIcons.map((Icon, i) => {
-        const angle = (i / orbitIcons.length) * 2 * Math.PI - Math.PI / 2;
-        const r = 46;
-        return (
-          <span
-            key={i}
-            className="glass-panel absolute flex size-12 items-center justify-center rounded-xl"
-            style={{
-              left: `calc(50% + ${Math.cos(angle) * r}% - 1.5rem)`,
-              top: `calc(50% + ${Math.sin(angle) * r}% - 1.5rem)`,
-              boxShadow: "0 0 24px -10px var(--b3-azul)",
-            }}
-          >
-            <Icon className="size-5 text-b3-cinza-azulado" strokeWidth={1.4} />
-          </span>
-        );
-      })}
+      <img
+        src={resiliaAsset.url}
+        alt="Resilia — agente de inteligência artificial da Superintendência de Resiliência Corporativa e Controles Integrados"
+        className="relative size-full rounded-full object-cover"
+        style={{ boxShadow: "0 0 60px -18px var(--b3-azul)" }}
+      />
     </div>
   );
 }
+
 
 const objetivos = [
   ["Simplificar", " e automatizar processos."],
