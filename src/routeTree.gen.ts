@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperintendenciaIdIndexRouteImport } from './routes/superintendencia.$id.index'
+import { Route as SuperintendenciaIdAgentesRouteImport } from './routes/superintendencia.$id.agentes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,44 @@ const SuperintendenciaIdIndexRoute = SuperintendenciaIdIndexRouteImport.update({
   path: '/superintendencia/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperintendenciaIdAgentesRoute =
+  SuperintendenciaIdAgentesRouteImport.update({
+    id: '/superintendencia/$id/agentes',
+    path: '/superintendencia/$id/agentes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
   '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
   '/superintendencia/$id': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
   '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/superintendencia/$id/'
+  fullPaths: '/' | '/superintendencia/$id/agentes' | '/superintendencia/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/superintendencia/$id'
-  id: '__root__' | '/' | '/superintendencia/$id/'
+  to: '/' | '/superintendencia/$id/agentes' | '/superintendencia/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/superintendencia/$id/agentes'
+    | '/superintendencia/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SuperintendenciaIdAgentesRoute: typeof SuperintendenciaIdAgentesRoute
   SuperintendenciaIdIndexRoute: typeof SuperintendenciaIdIndexRoute
 }
 
@@ -65,11 +80,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperintendenciaIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/superintendencia/$id/agentes': {
+      id: '/superintendencia/$id/agentes'
+      path: '/superintendencia/$id/agentes'
+      fullPath: '/superintendencia/$id/agentes'
+      preLoaderRoute: typeof SuperintendenciaIdAgentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SuperintendenciaIdAgentesRoute: SuperintendenciaIdAgentesRoute,
   SuperintendenciaIdIndexRoute: SuperintendenciaIdIndexRoute,
 }
 export const routeTree = rootRouteImport
