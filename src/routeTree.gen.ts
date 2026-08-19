@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperintendenciaIdIndexRouteImport } from './routes/superintendencia.$id.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperintendenciaIdIndexRoute = SuperintendenciaIdIndexRouteImport.update({
+  id: '/superintendencia/$id/',
+  path: '/superintendencia/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/superintendencia/$id': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/superintendencia/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/superintendencia/$id'
+  id: '__root__' | '/' | '/superintendencia/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SuperintendenciaIdIndexRoute: typeof SuperintendenciaIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/superintendencia/$id/': {
+      id: '/superintendencia/$id/'
+      path: '/superintendencia/$id'
+      fullPath: '/superintendencia/$id/'
+      preLoaderRoute: typeof SuperintendenciaIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SuperintendenciaIdIndexRoute: SuperintendenciaIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

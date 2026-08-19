@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowUpRight, BarChart3, Bot } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { getSuperintendencia } from "@/config/integrations";
 
-export const Route = createFileRoute("/superintendencia/$id")({
+export const Route = createFileRoute("/superintendencia/$id/")({
   head: () => ({
     meta: [
       { title: "Área da Superintendência — B3" },
