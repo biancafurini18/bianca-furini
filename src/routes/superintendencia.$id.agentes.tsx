@@ -118,8 +118,9 @@ function AgentesPage() {
 
             <div className="mt-20">
               <h2 className="font-display text-2xl font-bold text-foreground">
-                Agentes de IA <span className="text-muted-foreground">(Habilidades da Resilia)</span>
+                Conheça as habilidades da Resilia
               </h2>
+
               <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {agentesResilia.map((agente) => (
                   <AgenteCard key={agente.id} agente={agente} />
