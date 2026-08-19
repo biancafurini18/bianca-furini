@@ -1,24 +1,48 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+import { SuperintendenciaCard } from "@/components/SuperintendenciaCard";
+import { superintendencias } from "@/config/integrations";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Integridade, Risco e Resiliência — B3" },
+      {
+        name: "description",
+        content:
+          "Portal interno da Diretoria de Integridade, Risco e Resiliência da B3: agentes de IA e indicadores por superintendência.",
+      },
+      { property: "og:title", content: "Integridade, Risco e Resiliência — B3" },
+      {
+        property: "og:description",
+        content: "Agentes de IA e indicadores das superintendências de risco e resiliência.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <AppShell>
+      <section className="mx-auto max-w-6xl pt-10 text-center md:pt-20">
+        <p className="text-[0.7rem] font-semibold uppercase tracking-[0.4em] text-b3-cinza-azulado/70">
+          Diretoria
+        </p>
+        <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-extrabold leading-tight md:text-6xl">
+          <span className="text-gold">Integridade, Risco e Resiliência</span>
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
+          Selecione uma superintendência para acessar seus agentes de inteligência artificial e
+          painéis de indicadores.
+        </p>
+
+        <div className="mt-14 grid gap-5 text-left md:grid-cols-2">
+          {superintendencias.map((s) => (
+            <SuperintendenciaCard key={s.id} superintendencia={s} />
+          ))}
+        </div>
+      </section>
+    </AppShell>
   );
 }
