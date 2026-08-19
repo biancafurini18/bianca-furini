@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Cloud, Lock, Settings, ShieldCheck, Wifi } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AgenteCard } from "@/components/AgenteCard";
 import { EmConfiguracao } from "@/components/EmConfiguracao";
+import resiliaAsset from "@/assets/resilia.jpeg.asset.json";
 import { agentesResilia, getSuperintendencia } from "@/config/integrations";
+
 
 export const Route = createFileRoute("/superintendencia/$id/agentes")({
   head: () => ({
