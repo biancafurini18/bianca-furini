@@ -1,9 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { ChartPlaceholder, KpiCard } from "@/components/DashboardCards";
 import { EmConfiguracao } from "@/components/EmConfiguracao";
-import { dashboards, getSuperintendencia } from "@/config/integrations";
+import { getSuperintendencia } from "@/config/integrations";
 
 export const Route = createFileRoute("/superintendencia/$id/dashboards")({
   head: () => ({
@@ -31,7 +30,6 @@ export const Route = createFileRoute("/superintendencia/$id/dashboards")({
 
 function DashboardsPage() {
   const { sup } = Route.useLoaderData();
-  const config = dashboards[sup.id];
 
   return (
     <AppShell>
@@ -44,27 +42,14 @@ function DashboardsPage() {
           <ArrowLeft className="size-4" /> Voltar
         </Link>
 
-        <h1 className="mt-8 font-display text-3xl font-extrabold md:text-4xl">
-          <span className="text-gold">Dashboards / Indicadores</span>
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{sup.nome}</p>
-
-        {!sup.detalhado && (
+        <div className="mt-10">
+          <h1 className="font-display text-3xl font-extrabold md:text-4xl">
+            <span className="text-gold">Dashboards / Indicadores</span>
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">{sup.nome}</p>
           <div className="mt-8">
             <EmConfiguracao acao="Conectar fonte de dados" />
           </div>
-        )}
-
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {config.kpis.map((kpi) => (
-            <KpiCard key={kpi.id} kpi={kpi} />
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-5 lg:grid-cols-3">
-          {config.charts.map((chart) => (
-            <ChartPlaceholder key={chart.id} chart={chart} />
-          ))}
         </div>
       </section>
     </AppShell>
