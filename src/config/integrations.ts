@@ -41,11 +41,14 @@ export type SuperintendenciaId =
   | "riscos-corporativos"
   | "riscos-financeiros";
 
+export type CorDestaque = "turquesa" | "amarelo" | "verde" | "coral";
+
 export type Superintendencia = {
   id: SuperintendenciaId;
   nome: string;
   nomeCurto: string;
   detalhado: boolean;
+  cor: CorDestaque;
 };
 
 export const superintendencias: Superintendencia[] = [
@@ -54,24 +57,28 @@ export const superintendencias: Superintendencia[] = [
     nome: "Superintendência de Resiliência Corporativa e Controles Integrados",
     nomeCurto: "Resiliência Corporativa e Controles Integrados",
     detalhado: true,
+    cor: "turquesa",
   },
   {
     id: "compliance",
     nome: "Superintendência de Compliance",
     nomeCurto: "Compliance",
     detalhado: false,
+    cor: "amarelo",
   },
   {
     id: "riscos-corporativos",
     nome: "Superintendência de Riscos Corporativos",
     nomeCurto: "Riscos Corporativos",
     detalhado: false,
+    cor: "verde",
   },
   {
     id: "riscos-financeiros",
     nome: "Superintendência de Riscos Financeiros e Modelagem",
     nomeCurto: "Riscos Financeiros e Modelagem",
     detalhado: false,
+    cor: "coral",
   },
 ];
 
