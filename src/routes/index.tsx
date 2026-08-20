@@ -26,9 +26,10 @@ function Index() {
   return (
     <AppShell>
       <section className="mx-auto max-w-6xl pt-10 text-center md:pt-20">
-        <p className="text-[0.7rem] font-semibold uppercase tracking-[0.4em] text-b3-cinza-azulado/70">
+        <p className="inline-flex items-center gap-3 rounded-full border border-b3-dourado/40 bg-b3-azul/10 px-6 py-2 font-display text-sm font-extrabold uppercase tracking-[0.42em] text-b3-dourado md:text-base">
           Diretoria
         </p>
+
         <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-extrabold leading-tight md:text-6xl">
           <span className="text-gold">Integridade, Risco e Resiliência</span>
         </h1>
