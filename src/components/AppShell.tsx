@@ -1,20 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import b3Logo from "@/assets/b3.png.asset.json";
 
 export function B3Logo() {
   return (
-    <Link
-      to="/"
-      aria-label="B3 — página inicial"
-      className="flex items-baseline gap-0.5 font-display text-2xl font-extrabold tracking-tight"
-    >
-      <span className="rounded-md border border-b3-cinza-azulado/40 px-1.5 text-foreground">
-        B
-      </span>
-      <span className="text-b3-dourado">3</span>
+    <Link to="/" aria-label="B3 — página inicial" className="flex items-center">
+      <img src={b3Logo.url} alt="B3" className="h-8 w-auto md:h-10" />
     </Link>
   );
 }
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
