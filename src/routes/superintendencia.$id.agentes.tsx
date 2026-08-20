@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AgenteCard } from "@/components/AgenteCard";
 import { EmConfiguracao } from "@/components/EmConfiguracao";
-import resiliaAsset from "@/assets/resilia.jpeg.asset.json";
+import resiliaImg from "@/assets/resilia.png";
 import { agentesResilia, getSuperintendencia } from "@/config/integrations";
 
 
@@ -36,7 +36,7 @@ function ResiliaAvatar() {
     <div className="relative mx-auto flex size-72 items-center justify-center md:size-96">
       <div
         aria-hidden
-        className="absolute inset-2 rounded-full blur-2xl"
+        className="absolute -inset-4 rounded-full blur-3xl"
         style={{
           background:
             "radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--b3-azul) 55%, transparent), transparent 70%)",
@@ -44,10 +44,12 @@ function ResiliaAvatar() {
       />
       <div className="absolute inset-0 rounded-full border border-dashed border-b3-cinza-azulado/20" />
       <img
-        src={resiliaAsset.url}
+        src={resiliaImg}
         alt="Resilia — agente de inteligência artificial da Superintendência de Resiliência Corporativa e Controles Integrados"
-        className="relative size-full rounded-full object-cover"
-        style={{ boxShadow: "0 0 60px -18px var(--b3-azul)" }}
+        width={1024}
+        height={1024}
+        className="relative size-[92%] rounded-full border border-b3-azul/40 object-cover"
+        style={{ boxShadow: "0 0 70px -20px var(--b3-azul)" }}
       />
     </div>
   );
@@ -120,7 +122,6 @@ function AgentesPage() {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 Conheça as habilidades da Resilia
               </h2>
-
               <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {agentesResilia.map((agente) => (
                   <AgenteCard key={agente.id} agente={agente} />

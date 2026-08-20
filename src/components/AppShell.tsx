@@ -5,7 +5,7 @@ import b3Logo from "@/assets/b3.png.asset.json";
 export function B3Logo() {
   return (
     <Link to="/" aria-label="B3 — página inicial" className="flex items-center">
-      <img src={b3Logo.url} alt="B3" className="h-8 w-auto md:h-9" />
+      <img src={b3Logo.url} alt="B3" className="h-8 w-auto md:h-10" />
     </Link>
   );
 }
