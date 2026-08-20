@@ -30,8 +30,8 @@ function Index() {
           Diretoria
         </p>
 
-        <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-extrabold leading-tight md:text-6xl">
-          <span className="text-gold">Integridade, Risco e Resiliência</span>
+        <h1 className="mx-auto mt-5 max-w-4xl font-display text-4xl font-extrabold leading-tight text-b3-dourado md:text-6xl">
+          Integridade, Risco e Resiliência
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-sm text-muted-foreground md:text-base">
           Selecione uma superintendência para acessar seus agentes de inteligência artificial e
