@@ -58,9 +58,9 @@ export function ActivityWorkspace() {
     <Tabs value={view} onValueChange={v => { setView(v); setSearch(""); setStatusFilter("all"); setFrontFilter("all"); setPersonFilter("all"); }} className="mt-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5">
         <TabsList className="h-11 max-w-full rounded-md bg-muted/50">
-          <TabsTrigger value="entry" className="gap-2 px-3 py-2 sm:px-5"><ClipboardList className="size-4" />Lançamento</TabsTrigger>
-          <TabsTrigger value="manager" className="gap-2 px-3 py-2 sm:px-5"><Users className="size-4" />Gestor</TabsTrigger>
-          <TabsTrigger value="dashboard" className="gap-2 px-3 py-2 sm:px-5"><BarChart3 className="size-4" />Dashboard</TabsTrigger>
+          <TabsTrigger value="entry" className="gap-1 px-2 py-2 text-xs sm:gap-2 sm:px-5 sm:text-sm"><ClipboardList className="size-4" />Lançamento</TabsTrigger>
+          <TabsTrigger value="manager" className="gap-1 px-2 py-2 text-xs sm:gap-2 sm:px-5 sm:text-sm"><Users className="size-4" />Gestor</TabsTrigger>
+          <TabsTrigger value="dashboard" className="gap-1 px-2 py-2 text-xs sm:gap-2 sm:px-5 sm:text-sm"><BarChart3 className="size-4" />Dashboard</TabsTrigger>
         </TabsList>
         {view !== "dashboard" && <div className="w-full min-w-0 sm:w-72"><ActivitySelect label={view === "manager" ? "Gestor de demonstração" : "Funcionário de demonstração"} value={view === "manager" ? managerId : employeeId} options={state.people.filter(p => p.role === (view === "manager" ? "manager" : "employee"))} onChange={id => { if (view === "manager") { setManagerId(id); setPersonFilter("all"); } else setEmployeeId(id); }} /></div>}
       </div>
