@@ -104,12 +104,12 @@
   --border: oklch(0.32 0.06 274 / 60%);
   --input: oklch(0.32 0.06 274 / 70%);
   --ring: var(--b3-azul);
-  --table-surface: oklch(0.978 0.004 250);
+  --table-surface: oklch(0.82 0.012 250);
   --table-ink: oklch(0.29 0.025 260);
-  --table-muted-ink: oklch(0.47 0.025 260);
-  --table-header: oklch(0.93 0.01 250);
-  --table-border: oklch(0.85 0.014 250);
-  --table-hover: oklch(0.946 0.009 250);
+  --table-muted-ink: oklch(0.40 0.025 260);
+  --table-header: oklch(0.76 0.018 250);
+  --table-border: oklch(0.69 0.018 250);
+  --table-hover: oklch(0.78 0.015 250);
   --table-teal: oklch(0.43 0.075 208);
   --table-green: oklch(0.43 0.12 145);
   --table-coral: oklch(0.47 0.17 27);
