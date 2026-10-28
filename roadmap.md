@@ -1,4 +1,5 @@
 # Activity tracking
+- [ ] Lighten both activity tables, remove demonstration copy, and enforce period-only fractional hours; verify.
 - [x] Continue implementation as requested; complete and verify the demonstration screen.
 - [x] Build employee entry/edit screen and canonical fictitious repository dataset.
 - [x] Build manager table, employee filters and summary numbers.
