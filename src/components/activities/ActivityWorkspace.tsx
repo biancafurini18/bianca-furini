@@ -80,7 +80,7 @@ export function ActivityWorkspace() {
         </div>
         <div className="overflow-x-auto rounded-md border border-border bg-card/30">
           <table className="w-full min-w-[1020px] text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Prazo", "Horas", ""].map((title, i) => <th key={i} className="px-4 py-4 font-semibold">{title || <span className="sr-only">Ações</span>}</th>)}</tr></thead>
+            <thead className="border-b border-border bg-muted/40 text-xs text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Prazo", "Horas", "Ações"].map((title, i) => <th key={i} className="px-4 py-4 font-semibold">{title}</th>)}</tr></thead>
             <tbody>{rows.map(entry => <tr key={entry.id} className="border-b border-border/60 last:border-0 hover:bg-muted/20">
               <td className="max-w-80 px-4 py-5"><div className="font-semibold text-foreground">{state.activities.find(a => a.id === entry.activityId)?.name}</div><div className="mt-1 text-xs text-muted-foreground">{state.themes.find(t => t.id === entry.themeId)?.name}</div><div className="mt-2 max-w-72 truncate text-xs text-muted-foreground" title={entry.description}>{entry.description}</div></td>
               <td className="max-w-40 px-4 py-5 text-xs text-muted-foreground">{state.fronts.find(f => f.id === entry.frontId)?.name}</td>
