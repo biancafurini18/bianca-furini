@@ -1,0 +1,43 @@
+{
+  "demonstration": true,
+  "currentEmployeeId": "p-ana",
+  "currentManagerId": "p-mariana",
+  "people": [
+    { "id": "p-ana", "name": "Ana Carolina Martins", "managerId": "p-mariana", "role": "employee" },
+    { "id": "p-bruno", "name": "Bruno Henrique Almeida", "managerId": "p-mariana", "role": "employee" },
+    { "id": "p-camila", "name": "Camila Rodrigues Santos", "managerId": "p-mariana", "role": "employee" },
+    { "id": "p-diego", "name": "Diego Fernandes Costa", "managerId": "p-rafael", "role": "employee" },
+    { "id": "p-mariana", "name": "Mariana Oliveira Ribeiro", "managerId": null, "role": "manager" },
+    { "id": "p-rafael", "name": "Rafael Augusto Lima", "managerId": null, "role": "manager" }
+  ],
+  "fronts": [
+    { "id": "f-controles", "name": "Controles Integrados" },
+    { "id": "f-resiliencia", "name": "Resiliência Corporativa" },
+    { "id": "f-regulatorio", "name": "Conformidade Regulatória" }
+  ],
+  "themes": [
+    { "id": "m-controles", "frontId": "f-controles", "name": "Avaliação de controles" },
+    { "id": "m-planos", "frontId": "f-controles", "name": "Planos de ação" },
+    { "id": "m-continuidade", "frontId": "f-resiliencia", "name": "Continuidade de negócios" },
+    { "id": "m-incidentes", "frontId": "f-resiliencia", "name": "Gestão de incidentes" },
+    { "id": "m-aderencia", "frontId": "f-regulatorio", "name": "Aderência regulatória" }
+  ],
+  "activities": [
+    { "id": "a-matriz", "themeId": "m-controles", "name": "Revisão da matriz de controles" },
+    { "id": "a-evidencias", "themeId": "m-controles", "name": "Validação de evidências" },
+    { "id": "a-planos", "themeId": "m-planos", "name": "Acompanhamento de planos de ação" },
+    { "id": "a-teste", "themeId": "m-continuidade", "name": "Teste de continuidade operacional" },
+    { "id": "a-incidente", "themeId": "m-incidentes", "name": "Análise de incidente operacional" },
+    { "id": "a-regulacao", "themeId": "m-aderencia", "name": "Mapeamento de requisitos regulatórios" }
+  ],
+  "entries": [
+    { "id": "l-001", "frontId": "f-controles", "themeId": "m-controles", "activityId": "a-matriz", "status": "Em andamento", "origin": "Planejada", "type": "Recorrente", "deadline": "2026-11-06", "responsibleIds": ["p-ana"], "description": "Revisão dos controles-chave e atualização da matriz do ciclo trimestral.", "hours": 12.5, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-20T13:00:00Z", "updatedAt": "2026-10-27T16:30:00Z" },
+    { "id": "l-002", "frontId": "f-regulatorio", "themeId": "m-aderencia", "activityId": "a-regulacao", "status": "Concluída", "origin": "Planejada", "type": "Pontual", "deadline": "2026-10-26", "responsibleIds": ["p-ana", "p-bruno"], "description": "Consolidação dos requisitos aplicáveis e avaliação inicial das evidências.", "hours": 8, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-21T10:00:00Z", "updatedAt": "2026-10-26T17:00:00Z" },
+    { "id": "l-003", "frontId": "f-resiliencia", "themeId": "m-continuidade", "activityId": "a-teste", "status": "Não iniciada", "origin": "Planejada", "type": "Pontual", "deadline": "2026-11-13", "responsibleIds": ["p-ana", "p-camila"], "description": "Preparação do cenário de teste e alinhamento com as áreas participantes.", "hours": 3, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-23T14:00:00Z", "updatedAt": "2026-10-23T14:00:00Z" },
+    { "id": "l-004", "frontId": "f-controles", "themeId": "m-planos", "activityId": "a-planos", "status": "Em andamento", "origin": "Planejada", "type": "Recorrente", "deadline": "2026-10-23", "responsibleIds": ["p-ana"], "description": "Follow-up das ações corretivas e revisão dos prazos com os responsáveis.", "hours": 6, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-19T12:00:00Z", "updatedAt": "2026-10-22T15:00:00Z" },
+    { "id": "l-005", "frontId": "f-resiliencia", "themeId": "m-incidentes", "activityId": "a-incidente", "status": "Em andamento", "origin": "Não Planejada", "type": "Pontual", "deadline": "2026-11-02", "responsibleIds": ["p-bruno"], "description": "Avaliação de causa-raiz e elaboração do parecer de impacto operacional.", "hours": 10, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-24T09:00:00Z", "updatedAt": "2026-10-27T11:00:00Z" },
+    { "id": "l-006", "frontId": "f-controles", "themeId": "m-controles", "activityId": "a-evidencias", "status": "Concluída", "origin": "Planejada", "type": "Recorrente", "deadline": "2026-10-27", "responsibleIds": ["p-camila"], "description": "Validação documental dos controles de acesso e segregação de funções.", "hours": 7.5, "managerIds": ["p-mariana"], "version": 1, "createdAt": "2026-10-22T09:00:00Z", "updatedAt": "2026-10-27T16:00:00Z" },
+    { "id": "l-007", "frontId": "f-resiliencia", "themeId": "m-continuidade", "activityId": "a-teste", "status": "Em andamento", "origin": "Planejada", "type": "Pontual", "deadline": "2026-11-10", "responsibleIds": ["p-diego"], "description": "Execução do exercício de recuperação de sistemas críticos.", "hours": 16, "managerIds": ["p-rafael"], "version": 1, "createdAt": "2026-10-24T13:00:00Z", "updatedAt": "2026-10-27T13:00:00Z" }
+  ],
+  "audit": []
+}
