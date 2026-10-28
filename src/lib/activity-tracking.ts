@@ -15,6 +15,13 @@ export type Draft = Omit<Entry, "id" | "version" | "createdAt" | "updatedAt" | "
 export type Mutation = { id: string; entryId: string; expectedVersion: number | null; actorId: string; draft: Draft; at: string; catalog?: { front?: Front; theme?: Theme; activity?: Activity } };
 
 export const normalizeName = (name: string) => name.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
+export const formatHours = (hours: number) => hours.toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 2 });
+export function parseHours(value: string): number {
+  if (!/^\d+(?:\.\d+)?$/.test(value) || !Number.isFinite(Number(value)) || Number(value) <= 0) {
+    throw new Error("Informe horas maiores que zero, usando ponto para decimais (ex.: 2.5).");
+  }
+  return Number(value);
+}
 export const employeeEntries = (entries: Entry[], employeeId: string) => entries.filter(e => e.responsibleIds.includes(employeeId));
 export const managerEntries = (state: ActivityState, managerId: string) => state.entries.filter(e => e.responsibleIds.some(id => state.people.some(p => p.id === id && p.managerId === managerId)));
 export const managerIdsFor = (people: Person[], ids: string[]) => [...new Set(people.filter(p => ids.includes(p.id) && p.managerId).flatMap(p => p.managerId ? [p.managerId] : []))];
