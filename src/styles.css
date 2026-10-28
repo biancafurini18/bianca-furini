@@ -104,16 +104,18 @@
   --border: oklch(0.32 0.06 274 / 60%);
   --input: oklch(0.32 0.06 274 / 70%);
   --ring: var(--b3-azul);
-  --table-surface: oklch(0.82 0.012 250);
-  --table-ink: oklch(0.29 0.025 260);
-  --table-muted-ink: oklch(0.40 0.025 260);
-  --table-header: oklch(0.76 0.018 250);
-  --table-border: oklch(0.69 0.018 250);
-  --table-hover: oklch(0.78 0.015 250);
-  --table-teal: oklch(0.43 0.075 208);
-  --table-green: oklch(0.43 0.12 145);
-  --table-coral: oklch(0.47 0.17 27);
-  --table-amber: oklch(0.46 0.10 75);
+  --table-surface: oklch(0.905 0.01 250);
+  --table-ink: oklch(0.235 0.02 260);
+  --table-muted-ink: oklch(0.41 0.03 260);
+  --table-header: oklch(0.845 0.018 250);
+  --table-border: oklch(0.60 0.022 250);
+  --table-row-border: oklch(0.74 0.02 250);
+  --table-zebra: oklch(0.885 0.012 250);
+  --table-hover: oklch(0.87 0.035 215);
+  --table-teal: oklch(0.50 0.10 210);
+  --table-green: oklch(0.50 0.13 150);
+  --table-coral: oklch(0.52 0.18 28);
+  --table-amber: oklch(0.52 0.12 70);
 
   /* Efeitos do design system */
   --gradient-hero: radial-gradient(
@@ -151,6 +153,15 @@
   --b3-coral: var(--table-coral);
   --b3-amarelo: var(--table-amber);
   --b3-cinza-azulado: var(--table-muted-ink);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 12%), 0 14px 34px -20px oklch(0 0 0 / 55%);
+}
+
+.activity-table tbody tr:nth-child(even) {
+  background-color: var(--table-zebra);
+}
+
+.activity-table tbody tr:hover {
+  background-color: var(--table-hover);
 }
 
 @layer base {

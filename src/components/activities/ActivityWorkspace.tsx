@@ -72,10 +72,10 @@ export function ActivityWorkspace() {
           <div className="min-w-0 lg:w-56"><ActivitySelect label="Filtrar frente" value={frontFilter} onChange={setFrontFilter} options={[{ id: "all", name: "Todas as frentes" }, ...state.fronts]} /></div>
           <div className="min-w-0 lg:w-48"><ActivitySelect label="Filtrar status" value={statusFilter} onChange={setStatusFilter} options={[{ id: "all", name: "Todos os status" }, ...["Não iniciada", "Em andamento", "Concluída", "Suspensa"].map(name => ({ id: name, name }))]} /></div>
         </div>
-        <div className="activity-table overflow-x-auto rounded-md border border-border bg-background text-foreground">
+        <div className="activity-table overflow-x-auto rounded-lg border border-border border-t-2 border-t-b3-turquesa bg-background text-foreground">
           <table className="w-full min-w-[1020px] text-left text-sm">
-            <thead className="border-b border-border bg-muted text-xs text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Prazo", "Horas", "Ações"].map((title, i) => <th key={i} className="px-4 py-4 font-semibold">{title}</th>)}</tr></thead>
-            <tbody>{rows.map(entry => <tr key={entry.id} className="border-b border-border/60 last:border-0 hover:bg-accent">
+            <thead className="border-b-2 border-border bg-muted text-[11px] uppercase tracking-wider text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Prazo", "Horas", "Ações"].map((title, i) => <th key={i} className="px-4 py-4 font-semibold">{title}</th>)}</tr></thead>
+            <tbody>{rows.map(entry => <tr key={entry.id} className="border-b border-border last:border-0 hover:bg-accent">
               <td className="max-w-80 px-4 py-5"><div className="font-semibold text-foreground">{state.activities.find(a => a.id === entry.activityId)?.name}</div><div className="mt-1 text-xs text-muted-foreground">{state.themes.find(t => t.id === entry.themeId)?.name}</div><div className="mt-2 max-w-72 truncate text-xs text-muted-foreground" title={entry.description}>{entry.description}</div></td>
               <td className="max-w-40 px-4 py-5 text-xs text-muted-foreground">{state.fronts.find(f => f.id === entry.frontId)?.name}</td>
               {view === "manager" && <td className="max-w-48 px-4 py-5 text-xs">{entry.responsibleIds.map(id => <div key={id} className="mb-1">{personName(id)}</div>)}</td>}
