@@ -88,7 +88,7 @@ export function ActivityWorkspace() {
           </table>
           {!rows.length && <div className="p-12 text-center"><ClipboardList className="mx-auto mb-3 size-8 text-muted-foreground" /><p className="font-semibold">Nenhum lançamento encontrado</p><Button variant="link" onClick={() => { setSearch(""); setFrontFilter("all"); setStatusFilter("all"); setPersonFilter("all"); }}>Limpar filtros <ArrowUpRight /></Button></div>}
         </div>
-        <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-muted-foreground"><span>{rows.length} {rows.length === 1 ? "lançamento" : "lançamentos"}</span><span>Horas totais por iniciativa · compartilhadas contadas uma vez</span></div>
+        <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-muted-foreground"><span>{rows.length} {rows.length === 1 ? "lançamento" : "lançamentos"}</span></div>
       </>}
       <TabsContent value="dashboard"><div className="flex min-h-80 flex-col items-center justify-center border-b border-border py-16 text-center"><Construction className="mb-5 size-12 text-b3-turquesa" strokeWidth={1.3} /><h2 className="font-display text-2xl font-semibold">Dashboard em construção</h2><p className="mt-3 text-sm text-muted-foreground">Acompanhamento das Atividades</p></div></TabsContent>
     </Tabs>
