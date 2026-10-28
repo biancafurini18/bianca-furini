@@ -13,6 +13,8 @@ export const Route = createFileRoute("/")({
           "Portal interno da Diretoria de Integridade, Risco e Resiliência da B3: agentes de IA e indicadores por superintendência.",
       },
       { property: "og:title", content: "Integridade, Risco e Resiliência — B3" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "Agentes de IA e indicadores das superintendências de risco e resiliência.",

@@ -197,3 +197,13 @@ export const dashboards: Record<SuperintendenciaId, DashboardConfig> = {
   "riscos-corporativos": dashboardBase("riscos-corporativos"),
   "riscos-financeiros": dashboardBase("riscos-financeiros"),
 };
+
+/** Frontend demonstration only. Enable when the corresponding FastAPI contract is implemented. */
+export const activityIntegrations = {
+  identity: { id: "activity-me", label: "Identidade e gestor", endpoint: "" }, // /api/atividades/me
+  catalog: { id: "activity-catalog", label: "Catálogo canônico", endpoint: "" }, // /api/atividades/catalogo
+  entries: { id: "activity-entries", label: "Meus lançamentos", endpoint: "" }, // /api/atividades/lancamentos
+  team: { id: "activity-team", label: "Equipe do gestor", endpoint: "" }, // /api/atividades/equipe
+  mutations: { id: "activity-mutations", label: "Fila durável de alterações", endpoint: "" }, // /api/atividades/mutacoes
+  audit: { id: "activity-audit", label: "Histórico de alterações", endpoint: "" }, // /api/atividades/lancamentos/{id}/historico
+} satisfies Record<string, IntegrationPoint>;

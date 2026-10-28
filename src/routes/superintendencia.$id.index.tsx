@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowUpRight, BarChart3, Bot } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BarChart3, Bot, ClipboardList } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { getSuperintendencia } from "@/config/integrations";
 
@@ -16,6 +16,8 @@ export const Route = createFileRoute("/superintendencia/$id/")({
         property: "og:description",
         content: "Agentes de IA e dashboards da superintendência selecionada.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ params }) => {
@@ -42,6 +44,12 @@ function AreaSuperintendencia() {
       title: "Dashboards / Indicadores",
       desc: "Painéis de KPIs e visões analíticas da superintendência.",
     },
+    ...(sup.id === "resiliencia" ? [{
+      to: "/superintendencia/$id/atividades" as const,
+      icon: ClipboardList,
+      title: "Acompanhamento das Atividades",
+      desc: "Lançamento de horas e acompanhamento das iniciativas da equipe.",
+    }] : []),
   ];
 
   return (
