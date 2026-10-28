@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ActivitySelect } from "./ActivitySelect";
-import { managerIdsFor, statuses, type ActivityState, type Draft, type Entry, type Mutation } from "@/lib/activity-tracking";
+import { managerIdsFor, statuses, parseHours, formatHours, type ActivityState, type Draft, type Entry, type Mutation } from "@/lib/activity-tracking";
 
 function Field({ label, children, wide = false }: { label: string; children: ReactNode; wide?: boolean }) {
   return <div className={wide ? "min-w-0 md:col-span-2" : "min-w-0"}><div className="mb-2 text-xs font-semibold text-muted-foreground">{label}</div>{children}</div>;
@@ -19,6 +19,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
     frontId: "", themeId: "", activityId: "", status: "Não iniciada", origin: "Planejada", type: "Pontual", deadline: "", responsibleIds: [employeeId], description: "", hours: 0,
   });
   const [newFront, setNewFront] = useState<string | null>(null);
+  const [hoursInput, setHoursInput] = useState(entry ? formatHours(entry.hours) : "");
   const [newTheme, setNewTheme] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState<string | null>(null);
   const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
@@ -47,7 +48,8 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
     const themeId = newTheme !== null ? crypto.randomUUID() : draft.themeId;
     const activityId = newActivity !== null ? crypto.randomUUID() : draft.activityId;
     try {
-      await onSave({ id: crypto.randomUUID(), entryId: entry?.id ?? crypto.randomUUID(), expectedVersion: entry?.version ?? null, actorId: employeeId, at: new Date().toISOString(), draft: { ...draft, frontId, themeId, activityId }, catalog: {
+      const hours = parseHours(hoursInput);
+      await onSave({ id: crypto.randomUUID(), entryId: entry?.id ?? crypto.randomUUID(), expectedVersion: entry?.version ?? null, actorId: employeeId, at: new Date().toISOString(), draft: { ...draft, hours, frontId, themeId, activityId }, catalog: {
         ...(newFront !== null ? { front: { id: frontId, name: newFront.trim() } } : {}),
         ...(newTheme !== null ? { theme: { id: themeId, frontId, name: newTheme.trim() } } : {}),
         ...(newActivity !== null ? { activity: { id: activityId, themeId, name: newActivity.trim() } } : {}),
@@ -58,7 +60,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
   }
   return <Dialog open onOpenChange={open => { if (!open && !saving) onClose(); }}>
     <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-lg">
-      <DialogHeader><DialogTitle className="font-display text-xl">{entry ? "Editar lançamento" : "Novo lançamento"}</DialogTitle><DialogDescription>Dados fictícios · {entry ? `Versão ${entry.version}` : "Acompanhamento das Atividades"}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle className="font-display text-xl">{entry ? "Editar lançamento" : "Novo lançamento"}</DialogTitle><DialogDescription>{entry ? `Versão ${entry.version}` : "Acompanhamento das Atividades"}</DialogDescription></DialogHeader>
       <form onSubmit={submit} className="space-y-6">
         <fieldset disabled={saving} className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
@@ -71,7 +73,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
             <Field label="Origem *"><ActivitySelect label="Origem" value={draft.origin} onChange={v => field("origin", v)} options={["Planejada", "Não Planejada"].map(name => ({ id: name, name }))} /></Field>
             <Field label="Tipo *"><ActivitySelect label="Tipo" value={draft.type} onChange={v => field("type", v)} options={["Pontual", "Recorrente"].map(name => ({ id: name, name }))} /></Field>
             <Field label="Prazo *"><Input type="date" aria-label="Prazo" required value={draft.deadline} onChange={e => field("deadline", e.target.value)} className="h-10" /></Field>
-            <Field label="Esforço em horas *"><Input type="number" aria-label="Esforço em horas" required min="0.01" step="0.01" value={draft.hours || ""} placeholder="0,00" onChange={e => field("hours", Number(e.target.value))} className="h-10" /></Field>
+            <Field label="Esforço em horas *"><Input type="text" inputMode="decimal" aria-label="Esforço em horas" required value={hoursInput} placeholder="0.00" onChange={e => setHoursInput(e.target.value)} className="h-10" /></Field>
           </div>
           <div className="grid gap-5 border-t border-border pt-5 md:grid-cols-2">
             <Field label="Responsáveis *"><div className="space-y-3">{state.people.filter(p => p.role === "employee").map(p => <label key={p.id} className="flex items-center gap-2 text-sm"><Checkbox aria-label={p.name} checked={draft.responsibleIds.includes(p.id)} disabled={p.id === employeeId} onCheckedChange={checked => field("responsibleIds", checked ? [...draft.responsibleIds, p.id] : draft.responsibleIds.filter(id => id !== p.id))} /><span>{p.name}{p.id === employeeId && <span className="ml-2 text-xs text-b3-turquesa">Você</span>}</span></label>)}</div></Field>
@@ -80,7 +82,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
           </div>
         </fieldset>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4"><span className="text-xs text-muted-foreground">{saving ? "Processando na fila de demonstração…" : "Demonstração · alterações apenas nesta sessão"}</span><div className="flex gap-2"><Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button><Button type="submit" disabled={saving}><Save />{saving ? "Salvando…" : "Salvar lançamento"}</Button></div></div>
+        <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border pt-4"><div className="flex gap-2"><Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button><Button type="submit" disabled={saving}><Save />{saving ? "Salvando…" : "Salvar lançamento"}</Button></div></div>
       </form>
     </DialogContent>
   </Dialog>;

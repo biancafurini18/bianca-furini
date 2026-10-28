@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
-import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, type ActivityState, type Mutation } from "./activity-tracking";
+import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, type ActivityState, type Mutation } from "./activity-tracking";
 
 const state = (): ActivityState => structuredClone(demo);
 function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation {
@@ -9,6 +9,15 @@ function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation
   return { id: "cmd-1", entryId: entry.id, expectedVersion: entry.version, actorId: "p-ana", draft: { ...entry, hours: 14 }, at: "2026-10-28T23:25:00Z", ...overrides };
 }
 describe("Activity tracking rules", () => {
+  it("accepts fractional hours only with a period and displays the same separator", () => {
+    expect(parseHours("2.5")).toBe(2.5);
+    expect(parseHours("12.75")).toBe(12.75);
+    expect(parseHours("2")).toBe(2);
+    expect(formatHours(12.75)).toBe("12.75");
+    for (const invalid of ["2,5", "1,000.5", "1e2", "2.5.1", "", "0", "-2", "Infinity"]) {
+      expect(() => parseHours(invalid)).toThrow();
+    }
+  });
   it("employee sees only their own assignments, including shared ones", () => {
     expect(employeeEntries(state().entries, "p-ana").map(e => e.id)).toEqual(["l-001", "l-002", "l-003", "l-004"]);
   });
