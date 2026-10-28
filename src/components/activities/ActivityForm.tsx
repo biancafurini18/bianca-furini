@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ActivitySelect } from "./ActivitySelect";
+import { ActivityDatePicker } from "./ActivityDatePicker";
 import { managerIdsFor, statuses, parseHours, formatHours, type ActivityState, type Draft, type Entry, type Mutation } from "@/lib/activity-tracking";
 
 function Field({ label, children, wide = false }: { label: string; children: ReactNode; wide?: boolean }) {
@@ -16,7 +17,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
   onSave: (mutation: Mutation) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Draft>(entry ? { ...entry, responsibleIds: [...entry.responsibleIds] } : {
-    frontId: "", themeId: "", activityId: "", status: "Não iniciada", origin: "Planejada", type: "Pontual", deadline: "", responsibleIds: [employeeId], description: "", hours: 0,
+    frontId: "", themeId: "", activityId: "", status: "Não iniciada", origin: "Planejada", type: "Pontual", deadline: "", startDate: "", endDate: "", responsibleIds: [employeeId], description: "", hours: 0,
   });
   const [newFront, setNewFront] = useState<string | null>(null);
   const [hoursInput, setHoursInput] = useState(entry ? formatHours(entry.hours) : "");
@@ -72,7 +73,9 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
             <Field label="Status *"><ActivitySelect label="Status" value={draft.status} onChange={v => field("status", v)} options={statuses.map(name => ({ id: name, name }))} /></Field>
             <Field label="Origem *"><ActivitySelect label="Origem" value={draft.origin} onChange={v => field("origin", v)} options={["Planejada", "Não Planejada"].map(name => ({ id: name, name }))} /></Field>
             <Field label="Tipo *"><ActivitySelect label="Tipo" value={draft.type} onChange={v => field("type", v)} options={["Pontual", "Recorrente"].map(name => ({ id: name, name }))} /></Field>
-            <Field label="Prazo *"><Input type="date" aria-label="Prazo" required value={draft.deadline} onChange={e => field("deadline", e.target.value)} className="h-10" /></Field>
+            <Field label="Início da atividade *"><ActivityDatePicker label="Início da atividade" value={draft.startDate} onChange={v => field("startDate", v)} /></Field>
+            <Field label="Fim da atividade *"><ActivityDatePicker label="Fim da atividade" value={draft.endDate} onChange={v => field("endDate", v)} /></Field>
+            <Field label="Prazo *"><ActivityDatePicker label="Prazo" value={draft.deadline} onChange={v => field("deadline", v)} /></Field>
             <Field label="Esforço em horas *"><Input type="text" inputMode="decimal" aria-label="Esforço em horas" required value={hoursInput} placeholder="0.00" onChange={e => setHoursInput(e.target.value)} className="h-10" /></Field>
           </div>
           <div className="grid gap-5 border-t border-border pt-5 md:grid-cols-2">

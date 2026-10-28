@@ -5,7 +5,7 @@ export type Activity = { id: string; themeId: string; name: string };
 export const statuses = ["Não iniciada", "Em andamento", "Concluída", "Suspensa"] as const;
 export type Entry = {
   id: string; frontId: string; themeId: string; activityId: string;
-  status: string; origin: string; type: string; deadline: string;
+  status: string; origin: string; type: string; deadline: string; startDate: string; endDate: string;
   responsibleIds: string[]; description: string; hours: number; managerIds: string[];
   version: number; createdAt: string; updatedAt: string;
 };
@@ -16,6 +16,15 @@ export type Mutation = { id: string; entryId: string; expectedVersion: number | 
 
 export const normalizeName = (name: string) => name.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
 export const formatHours = (hours: number) => hours.toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 2 });
+export function validActivityDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+export function validateActivityPeriod(startDate: string, endDate: string): void {
+  if (!validActivityDate(startDate) || !validActivityDate(endDate)) throw new Error("Informe início e fim válidos para o período da atividade.");
+  if (endDate < startDate) throw new Error("O fim da atividade não pode ser anterior ao início.");
+}
 export function parseHours(value: string): number {
   if (!/^\d+(?:\.\d+)?$/.test(value) || !Number.isFinite(Number(value)) || Number(value) <= 0) {
     throw new Error("Informe horas maiores que zero, usando ponto para decimais (ex.: 2.5).");
@@ -41,6 +50,7 @@ export function applyMutation(state: ActivityState, mutation: Mutation): Activit
   const { draft } = mutation;
   if (!Number.isFinite(draft.hours) || draft.hours <= 0) throw new Error("Informe um esforço em horas maior que zero.");
   if (!draft.description.trim()) throw new Error("Informe a descrição da atividade.");
+  validateActivityPeriod(draft.startDate, draft.endDate);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.deadline) || Number.isNaN(Date.parse(draft.deadline))) throw new Error("Informe um prazo válido.");
   if (!(statuses as readonly string[]).includes(draft.status) || !["Planejada", "Não Planejada"].includes(draft.origin) || !["Pontual", "Recorrente"].includes(draft.type)) throw new Error("Selecione status, origem e tipo válidos.");
   if (draft.responsibleIds.some(id => !state.people.some(p => p.id === id && p.role === "employee" && p.managerId))) throw new Error("Selecione responsáveis válidos com gestor cadastrado.");

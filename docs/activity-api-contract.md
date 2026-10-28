@@ -15,6 +15,8 @@ Os pontos de integração ficam em `src/config/integrations.ts` e começam desat
 - `GET /api/atividades/lancamentos/{id}/historico`: exigir acesso à iniciativa; devolver ator, data UTC, ação, versão anterior/nova e campos alterados, com paginação.
 
 ## Fila, conflitos e auditoria obrigatórios no servidor
+Os lançamentos e `draft` incluem `startDate` e `endDate` obrigatórios, no formato de data civil `YYYY-MM-DD`, sem conversão de fuso horário. Validar datas existentes no calendário e `endDate >= startDate`; atividades de um dia são válidas. Manter `deadline` como prazo independente. Incluir o período nos snapshots antes/depois e retornos da API. O Gantt utiliza exclusivamente os lançamentos já autorizados e filtrados de cada visão, sem endpoint ou acesso adicional.
+
 1. Persistir cada comando em uma fila durável, com unicidade de `mutationId` por solicitante e retentativas idempotentes. Não usar fila em memória de processo.
 2. Processar sequencialmente por iniciativa dentro de transação, com verificação `expectedVersion`. Escritas concorrentes não podem sobrescrever silenciosamente outras alterações. Em conflito, conservar o comando com estado `conflict` e exigir revisão/reenvio; não aplicar cegamente uma versão antiga.
 3. Na mesma transação, validar catálogo, responsáveis e propriedade, derivar gestores, escrever a iniciativa, incrementar versão, registrar auditoria imutável antes/depois e concluir o comando. Se qualquer etapa falhar, nenhuma alteração parcial pode permanecer.
