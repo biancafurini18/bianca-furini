@@ -17,6 +17,8 @@ export const Route = createFileRoute("/superintendencia/$id/agentes")({
           "Resilia: agente de inteligência artificial e automação da Superintendência de Resiliência Corporativa e Controles Integrados.",
       },
       { property: "og:title", content: "Agentes de IA — Resilia | B3" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "Habilidades de IA e automação para controles, riscos e conformidade.",

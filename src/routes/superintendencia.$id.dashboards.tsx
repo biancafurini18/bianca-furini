@@ -14,6 +14,8 @@ export const Route = createFileRoute("/superintendencia/$id/dashboards")({
           "Painéis de KPIs e indicadores da Diretoria de Integridade, Risco e Resiliência da B3.",
       },
       { property: "og:title", content: "Dashboards e Indicadores — B3" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "KPIs e visões analíticas por superintendência, conectados ao Databricks.",

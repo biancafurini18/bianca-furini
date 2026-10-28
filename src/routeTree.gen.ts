@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperintendenciaIdIndexRouteImport } from './routes/superintendencia.$id.index'
 import { Route as SuperintendenciaIdAgentesRouteImport } from './routes/superintendencia.$id.agentes'
+import { Route as SuperintendenciaIdAtividadesRouteImport } from './routes/superintendencia.$id.atividades'
 import { Route as SuperintendenciaIdDashboardsRouteImport } from './routes/superintendencia.$id.dashboards'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,6 +31,12 @@ const SuperintendenciaIdAgentesRoute =
     path: '/superintendencia/$id/agentes',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SuperintendenciaIdAtividadesRoute =
+  SuperintendenciaIdAtividadesRouteImport.update({
+    id: '/superintendencia/$id/atividades',
+    path: '/superintendencia/$id/atividades',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuperintendenciaIdDashboardsRoute =
   SuperintendenciaIdDashboardsRouteImport.update({
     id: '/superintendencia/$id/dashboards',
@@ -40,12 +47,14 @@ const SuperintendenciaIdDashboardsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
+  '/superintendencia/$id/atividades': typeof SuperintendenciaIdAtividadesRoute
   '/superintendencia/$id/dashboards': typeof SuperintendenciaIdDashboardsRoute
   '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
+  '/superintendencia/$id/atividades': typeof SuperintendenciaIdAtividadesRoute
   '/superintendencia/$id/dashboards': typeof SuperintendenciaIdDashboardsRoute
   '/superintendencia/$id': typeof SuperintendenciaIdIndexRoute
 }
@@ -53,6 +62,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/superintendencia/$id/agentes': typeof SuperintendenciaIdAgentesRoute
+  '/superintendencia/$id/atividades': typeof SuperintendenciaIdAtividadesRoute
   '/superintendencia/$id/dashboards': typeof SuperintendenciaIdDashboardsRoute
   '/superintendencia/$id/': typeof SuperintendenciaIdIndexRoute
 }
@@ -61,18 +71,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/superintendencia/$id/agentes'
+    | '/superintendencia/$id/atividades'
     | '/superintendencia/$id/dashboards'
     | '/superintendencia/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/superintendencia/$id/agentes'
+    | '/superintendencia/$id/atividades'
     | '/superintendencia/$id/dashboards'
     | '/superintendencia/$id'
   id:
     | '__root__'
     | '/'
     | '/superintendencia/$id/agentes'
+    | '/superintendencia/$id/atividades'
     | '/superintendencia/$id/dashboards'
     | '/superintendencia/$id/'
   fileRoutesById: FileRoutesById
@@ -80,6 +93,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SuperintendenciaIdAgentesRoute: typeof SuperintendenciaIdAgentesRoute
+  SuperintendenciaIdAtividadesRoute: typeof SuperintendenciaIdAtividadesRoute
   SuperintendenciaIdDashboardsRoute: typeof SuperintendenciaIdDashboardsRoute
   SuperintendenciaIdIndexRoute: typeof SuperintendenciaIdIndexRoute
 }
@@ -107,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperintendenciaIdAgentesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/superintendencia/$id/atividades': {
+      id: '/superintendencia/$id/atividades'
+      path: '/superintendencia/$id/atividades'
+      fullPath: '/superintendencia/$id/atividades'
+      preLoaderRoute: typeof SuperintendenciaIdAtividadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superintendencia/$id/dashboards': {
       id: '/superintendencia/$id/dashboards'
       path: '/superintendencia/$id/dashboards'
@@ -120,6 +141,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SuperintendenciaIdAgentesRoute: SuperintendenciaIdAgentesRoute,
+  SuperintendenciaIdAtividadesRoute: SuperintendenciaIdAtividadesRoute,
   SuperintendenciaIdDashboardsRoute: SuperintendenciaIdDashboardsRoute,
   SuperintendenciaIdIndexRoute: SuperintendenciaIdIndexRoute,
 }
