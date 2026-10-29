@@ -1,10 +1,10 @@
 import { differenceInCalendarDays, endOfMonth, endOfWeek, eachMonthOfInterval, eachWeekOfInterval, format, parseISO, startOfMonth, startOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { validActivityDate, type Entry } from "./activity-tracking";
+import { statuses, validActivityDate, type Entry } from "./activity-tracking";
 
 export type GanttScale = "week" | "month";
 export function activityTimeline(entries: Entry[], scale: GanttScale) {
-  const scheduled = entries.filter(e => validActivityDate(e.startDate) && validActivityDate(e.endDate) && e.endDate >= e.startDate).slice().sort((a, b) => a.startDate.localeCompare(b.startDate) || a.id.localeCompare(b.id));
+  const scheduled = entries.filter(e => !e.deletedAt && validActivityDate(e.startDate) && validActivityDate(e.endDate) && e.endDate >= e.startDate).slice().sort((a, b) => a.startDate.localeCompare(b.startDate) || a.id.localeCompare(b.id));
   if (!scheduled.length) return null;
   const earliest = scheduled.reduce((min, e) => e.startDate < min ? e.startDate : min, scheduled[0]?.startDate ?? "");
   const latest = scheduled.reduce((max, e) => e.endDate > max ? e.endDate : max, scheduled[0]?.endDate ?? "");
@@ -24,7 +24,8 @@ export function activityTimeline(entries: Entry[], scale: GanttScale) {
     const firstDate = children.reduce((min, item) => item.entry.startDate < min ? item.entry.startDate : min, children[0]?.entry.startDate ?? "");
     const lastDate = children.reduce((max, item) => item.entry.endDate > max ? item.entry.endDate : max, children[0]?.entry.endDate ?? "");
     const duration = differenceInCalendarDays(parseISO(lastDate), parseISO(firstDate)) + 1;
-    return { themeId, left, width: right - left, duration, children };
+    const statusSegments = statuses.map(status => ({ status, count: children.filter(item => item.entry.status === status).length })).filter(segment => segment.count > 0);
+    return { themeId, left, width: right - left, duration, itemCount: children.length, statusSegments, children };
   });
   return { start, end, days, buckets, position, entries: items, groups };
 }
