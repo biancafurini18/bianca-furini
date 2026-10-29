@@ -35,7 +35,7 @@ export function activityTimeline(entries: Entry[], scale: GanttScale) {
     const lastDate = children.reduce((max, item) => item.entry.endDate > max ? item.entry.endDate : max, children[0]?.entry.endDate ?? "");
     const duration = differenceInCalendarDays(parseISO(lastDate), parseISO(firstDate)) + 1;
     const statusSegments = statuses.map(status => ({ status, count: children.filter(item => item.entry.status === status).length })).filter(segment => segment.count > 0);
-    return { themeId, left, width: right - left, duration, itemCount: children.length, statusSegments, children };
+    return { themeId, left, width: right - left, duration, itemCount: children.length, statusSegments, status: rollupStatus(children), children };
   });
   return { start, end, days, buckets, position, entries: items, groups };
 }
