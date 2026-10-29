@@ -1,6 +1,16 @@
 import { differenceInCalendarDays, endOfMonth, endOfWeek, eachMonthOfInterval, eachWeekOfInterval, format, parseISO, startOfMonth, startOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { statuses, validActivityDate, type Entry } from "./activity-tracking";
+import { statuses, validActivityDate, type Entry, type Status } from "./activity-tracking";
+
+/** Cor do macrotema: andamento se alguma em andamento; suspenso se alguma suspensa; concluído só se todas concluídas; não iniciado só se todas não iniciadas. */
+export function rollupStatus(children: { entry: Entry }[]): Status {
+  const list = children.map(child => child.entry.status);
+  if (list.includes("Em andamento")) return "Em andamento";
+  if (list.includes("Suspenso")) return "Suspenso";
+  if (list.every(status => status === "Concluído")) return "Concluído";
+  if (list.every(status => status === "Não iniciado")) return "Não iniciado";
+  return "Em andamento";
+}
 
 export type GanttScale = "week" | "month";
 export function activityTimeline(entries: Entry[], scale: GanttScale) {
