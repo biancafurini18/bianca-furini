@@ -64,28 +64,28 @@ export function ActivityWorkspace() {
           <div><h2 className="font-display text-xl font-semibold">{view === "manager" ? "Visão da equipe" : "Meus lançamentos"}</h2><p className="mt-1 text-sm text-muted-foreground">{view === "manager" ? `${personName(managerId)} · ${team.length} funcionários` : `${personName(employeeId)} · Gestor: ${personName(employee?.managerId ?? "")}`}</p></div>
           {view === "entry" && <Button onClick={() => setForm({ entry: null })} className="h-10"><Plus />Novo lançamento</Button>}
         </div>
-        <div className="my-7 grid grid-cols-2 gap-x-5 gap-y-6 border-y border-border py-6 lg:grid-cols-4">
-          {metrics.map(metric => <div key={metric.label} className="min-w-0 border-l-2 border-border pl-4"><div className="flex items-center gap-2 text-xs font-medium text-muted-foreground"><metric.icon className={`size-4 shrink-0 ${metric.color}`} />{metric.label}</div><div className={`mt-2 font-display text-3xl font-semibold ${metric.color}`}>{metric.value}</div></div>)}
+        <div className="my-5 grid grid-cols-2 gap-x-4 gap-y-4 border-y border-border py-4 lg:grid-cols-4">
+          {metrics.map(metric => <div key={metric.label} className="min-w-0 border-l-2 border-border pl-3"><div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground"><metric.icon className={`size-3.5 shrink-0 ${metric.color}`} />{metric.label}</div><div className={`mt-1 font-display text-2xl font-semibold ${metric.color}`}>{metric.value}</div></div>)}
         </div>
-        <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:flex">
           <div className="relative min-w-0 lg:flex-1"><Search className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="Buscar lançamentos" placeholder="Buscar atividade ou macrotema" className="h-10 pl-9" value={search} onChange={e => setSearch(e.target.value)} /></div>
           {view === "manager" && <div className="min-w-0 lg:w-64"><ActivitySelect label="Filtrar funcionário" value={personFilter} onChange={setPersonFilter} options={[{ id: "all", name: "Todos os funcionários" }, ...team]} /></div>}
           <div className="min-w-0 lg:w-56"><ActivitySelect label="Filtrar frente" value={frontFilter} onChange={setFrontFilter} options={[{ id: "all", name: "Todas as frentes" }, ...state.fronts]} /></div>
           <div className="min-w-0 lg:w-48"><ActivitySelect label="Filtrar status" value={statusFilter} onChange={setStatusFilter} options={[{ id: "all", name: "Todos os status" }, ...["Não iniciada", "Em andamento", "Concluída", "Suspensa"].map(name => ({ id: name, name }))]} /></div>
         </div>
         <div className="activity-table overflow-x-auto rounded-lg border border-border border-t-2 border-t-b3-turquesa bg-background text-foreground">
-          <table className="w-full min-w-[1180px] text-left text-sm">
-            <thead className="border-b-2 border-border bg-muted text-[11px] uppercase tracking-wider text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Período · Início / Fim", "Prazo", "Horas", "Ações"].map((title, i) => <th key={i} className="px-4 py-4 font-semibold">{title}</th>)}</tr></thead>
+          <table className="w-full min-w-[1180px] text-left text-[13px]">
+            <thead className="border-b-2 border-border bg-muted text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{["Atividade / Macrotema", "Frente", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Período · Início / Fim", "Prazo", "Horas", "Ações"].map((title, i) => <th key={i} className="px-3 py-2.5 font-semibold">{title}</th>)}</tr></thead>
             <tbody>{rows.map(entry => <tr key={entry.id} className="border-b border-border last:border-0 hover:bg-accent">
-              <td className="max-w-80 px-4 py-5"><div className="font-semibold text-foreground">{state.activities.find(a => a.id === entry.activityId)?.name}</div><div className="mt-1 text-xs text-muted-foreground">{state.themes.find(t => t.id === entry.themeId)?.name}</div><div className="mt-2 max-w-72 truncate text-xs text-muted-foreground" title={entry.description}>{entry.description}</div></td>
-              <td className="max-w-40 px-4 py-5 text-xs text-muted-foreground">{state.fronts.find(f => f.id === entry.frontId)?.name}</td>
-              {view === "manager" && <td className="max-w-48 px-4 py-5 text-xs">{entry.responsibleIds.map(id => <div key={id} className="mb-1">{personName(id)}</div>)}</td>}
-              <td className="px-4 py-5"><ActivityStatus status={entry.status} /></td>
-              <td className="px-4 py-5 text-xs"><div>{entry.origin}</div><div className="mt-1 text-muted-foreground">{entry.type}</div></td>
-              <td className="whitespace-nowrap px-4 py-5 text-xs"><div>{date(entry.startDate)}</div><div className="mt-1 text-muted-foreground">até {date(entry.endDate)}</div></td>
-              <td className={`whitespace-nowrap px-4 py-5 text-xs ${today && isOverdue(entry, today) ? "text-b3-coral" : "text-muted-foreground"}`}>{date(entry.deadline)}{today && isOverdue(entry, today) && <div className="mt-1 font-semibold">Vencido</div>}</td>
-              <td className="whitespace-nowrap px-4 py-5 font-semibold tabular-nums">{formatHours(entry.hours)} h</td>
-              <td className="px-3 py-5"><div className="flex gap-1">{view === "entry" && <Button variant="ghost" size="icon" aria-label={`Editar ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Editar lançamento" onClick={() => setForm({ entry })}><Pencil className="text-b3-turquesa" /></Button>}<Button variant="ghost" size="icon" aria-label={`Histórico ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Detalhes e histórico" onClick={() => setHistory(entry)}><History /></Button></div></td>
+              <td className="max-w-72 px-3 py-2.5"><div className="font-semibold text-foreground">{state.activities.find(a => a.id === entry.activityId)?.name}</div><div className="mt-0.5 text-[11px] text-muted-foreground">{state.themes.find(t => t.id === entry.themeId)?.name}</div><div className="mt-1 max-w-64 truncate text-[11px] text-muted-foreground" title={entry.description}>{entry.description}</div></td>
+              <td className="max-w-40 px-3 py-2.5 text-[11px] text-muted-foreground">{state.fronts.find(f => f.id === entry.frontId)?.name}</td>
+              {view === "manager" && <td className="max-w-44 px-3 py-2.5 text-[11px]">{entry.responsibleIds.map(id => <div key={id} className="mb-0.5">{personName(id)}</div>)}</td>}
+              <td className="px-3 py-2.5"><ActivityStatus status={entry.status} /></td>
+              <td className="px-3 py-2.5 text-[11px]"><div>{entry.origin}</div><div className="text-muted-foreground">{entry.type}</div></td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-[11px]"><div>{date(entry.startDate)}</div><div className="text-muted-foreground">até {date(entry.endDate)}</div></td>
+              <td className={`whitespace-nowrap px-3 py-2.5 text-[11px] ${today && isOverdue(entry, today) ? "text-b3-coral" : "text-muted-foreground"}`}>{date(entry.deadline)}{today && isOverdue(entry, today) && <div className="font-semibold">Vencido</div>}</td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold tabular-nums">{formatHours(entry.hours)} h</td>
+              <td className="px-2 py-2.5"><div className="flex gap-1">{view === "entry" && <Button variant="ghost" size="icon" aria-label={`Editar ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Editar lançamento" onClick={() => setForm({ entry })}><Pencil className="text-b3-turquesa" /></Button>}<Button variant="ghost" size="icon" aria-label={`Histórico ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Detalhes e histórico" onClick={() => setHistory(entry)}><History /></Button></div></td>
             </tr>)}</tbody>
           </table>
           {!rows.length && <div className="p-12 text-center"><ClipboardList className="mx-auto mb-3 size-8 text-muted-foreground" /><p className="font-semibold">Nenhum lançamento encontrado</p><Button variant="link" onClick={() => { setSearch(""); setFrontFilter("all"); setStatusFilter("all"); setPersonFilter("all"); }}>Limpar filtros <ArrowUpRight /></Button></div>}
