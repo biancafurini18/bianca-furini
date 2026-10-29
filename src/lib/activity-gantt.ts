@@ -2,6 +2,18 @@ import { differenceInCalendarDays, endOfMonth, endOfWeek, eachMonthOfInterval, e
 import { ptBR } from "date-fns/locale";
 import { statuses, validActivityDate, type Entry } from "./activity-tracking";
 
+export type Status = (typeof statuses)[number];
+
+/** Cor do macrotema: andamento se alguma em andamento; suspensa se alguma suspensa; concluída só se todas concluídas; não iniciada só se todas não iniciadas. */
+export function rollupStatus(children: { entry: Entry }[]): Status {
+  const list = children.map(child => child.entry.status);
+  if (list.includes("Em andamento")) return "Em andamento";
+  if (list.includes("Suspensa")) return "Suspensa";
+  if (list.every(status => status === "Concluída")) return "Concluída";
+  if (list.every(status => status === "Não iniciada")) return "Não iniciada";
+  return "Em andamento";
+}
+
 export type GanttScale = "week" | "month";
 export function activityTimeline(entries: Entry[], scale: GanttScale) {
   const scheduled = entries.filter(e => !e.deletedAt && validActivityDate(e.startDate) && validActivityDate(e.endDate) && e.endDate >= e.startDate).slice().sort((a, b) => a.startDate.localeCompare(b.startDate) || a.id.localeCompare(b.id));
@@ -25,7 +37,7 @@ export function activityTimeline(entries: Entry[], scale: GanttScale) {
     const lastDate = children.reduce((max, item) => item.entry.endDate > max ? item.entry.endDate : max, children[0]?.entry.endDate ?? "");
     const duration = differenceInCalendarDays(parseISO(lastDate), parseISO(firstDate)) + 1;
     const statusSegments = statuses.map(status => ({ status, count: children.filter(item => item.entry.status === status).length })).filter(segment => segment.count > 0);
-    return { themeId, left, width: right - left, duration, itemCount: children.length, statusSegments, children };
+    return { themeId, left, width: right - left, duration, itemCount: children.length, statusSegments, status: rollupStatus(children), children };
   });
   return { start, end, days, buckets, position, entries: items, groups };
 }

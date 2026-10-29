@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
-import { activityTimeline } from "./activity-gantt";
+import { activityTimeline, rollupStatus } from "./activity-gantt";
 import { employeeEntries, managerEntries } from "./activity-tracking";
 
 describe("Activity Gantt", () => {
@@ -55,5 +55,17 @@ describe("Activity Gantt", () => {
     expect(timeline?.days).toBe(62);
     expect(timeline?.buckets.map(b => b.key)).toEqual(["2026-12-01", "2027-01-01"]);
     expect(activityTimeline([], "week")).toBeNull();
+  });
+  it("rolls up macrotheme color: andamento se alguma em andamento, suspensa se alguma suspensa, concluída só se todas, não iniciada só se todas", () => {
+    const entry = demo.entries[0]; if (!entry) throw new Error("Missing fixture");
+    const withStatuses = (...list: string[]) => list.map((status, i) => ({ entry: { ...entry, id: `s-${i}`, status } }));
+    expect(rollupStatus(withStatuses("Concluída", "Concluída"))).toBe("Concluída");
+    expect(rollupStatus(withStatuses("Concluída", "Em andamento"))).toBe("Em andamento");
+    expect(rollupStatus(withStatuses("Não iniciada", "Suspensa"))).toBe("Suspensa");
+    expect(rollupStatus(withStatuses("Suspensa", "Em andamento"))).toBe("Em andamento");
+    expect(rollupStatus(withStatuses("Não iniciada", "Não iniciada"))).toBe("Não iniciada");
+    expect(rollupStatus(withStatuses("Concluída", "Não iniciada"))).toBe("Em andamento");
+    const group = activityTimeline(withStatuses("Concluída", "Concluída").map(item => item.entry), "week")?.groups[0];
+    expect(group?.status).toBe("Concluída");
   });
 });
