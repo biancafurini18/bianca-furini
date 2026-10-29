@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
-import { applyMutation, DemoMutationQueue, employeeEntries, macrothemeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
+import { applyDeletion, applyMutation, DemoMutationQueue, employeeEntries, macrothemeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
 
 const state = (): ActivityState => {
   const snapshot: ActivityState = structuredClone(demo);
@@ -12,6 +12,35 @@ function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation
   return { id: "cmd-1", entryId: entry.id, expectedVersion: entry.version, actorId: "p-ana", draft: { ...entry, hours: 14 }, at: "2026-10-28T23:25:00Z", ...overrides };
 }
 describe("Activity tracking rules", () => {
+  it("deletes a shared entry from all scopes while retaining catalog and immutable audit", () => {
+    const s = state(); const m = mutation(s);
+    const next = applyDeletion(s, { ...m, expectedVersion: 1 });
+    expect(employeeEntries(next.entries, "p-ana").map(e => e.id)).not.toContain(m.entryId);
+    expect(managerEntries(next, "p-mariana").map(e => e.id)).not.toContain(m.entryId);
+    expect(next.activities).toEqual(s.activities);
+    expect(next.audit[0]?.action).toBe("delete");
+    expect(next.audit[0]?.before?.version).toBe(1);
+    expect(next.audit[0]?.after.version).toBe(2);
+    expect(next.audit[0]?.after.deletedAt).toBe(m.at);
+    const original = s.entries[0]; if (!original) throw new Error("Fixture missing");
+    original.description = "Changed externally";
+    expect(next.audit[0]?.before?.description).not.toBe(original.description);
+  });
+  it("blocks deletion by unassigned employees and read-only managers", () => {
+    const s = state(); const m = mutation(s);
+    for (const actorId of ["p-diego", "p-mariana"]) expect(() => applyDeletion(s, { ...m, actorId, expectedVersion: 1 })).toThrow("não pode excluir");
+    expect(s.audit).toHaveLength(0);
+  });
+  it("checks deletion versions through the shared queue and blocks stale resurrection", async () => {
+    let s = state(); const queue = new DemoMutationQueue(); const m = mutation(s);
+    await queue.enqueue(() => { s = applyMutation(s, m); });
+    await expect(queue.enqueue(() => { s = applyDeletion(s, { ...m, id: "delete-stale", expectedVersion: 1 }); })).rejects.toThrow("foi alterada");
+    const deletion = { ...m, id: "delete-current", expectedVersion: 2 };
+    await queue.enqueue(() => { s = applyDeletion(s, deletion); });
+    expect(applyDeletion(s, deletion)).toBe(s);
+    expect(s.audit).toHaveLength(2);
+    expect(() => applyMutation(s, { ...m, id: "stale-edit", expectedVersion: 3 })).toThrow("excluída");
+  });
   it("allows observation to be omitted or empty when saving", () => {
     for (const observation of [undefined, ""]) {
       const s = state(); const m = mutation(s);

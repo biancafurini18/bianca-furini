@@ -4,6 +4,18 @@ import { activityTimeline } from "./activity-gantt";
 import { employeeEntries, managerEntries } from "./activity-tracking";
 
 describe("Activity Gantt", () => {
+  it("counts 20 scoped items over 5 inclusive days and exposes all legend statuses", () => {
+    const entry = demo.entries[0]; if (!entry) throw new Error("Missing fixture");
+    const entries = Array.from({ length: 20 }, (_, i) => ({ ...entry, id: `item-${i}`, startDate: "2026-10-20", endDate: "2026-10-24", status: i < 10 ? "Em andamento" : "Concluída" }));
+    const group = activityTimeline(entries, "week")?.groups[0];
+    expect(group?.itemCount).toBe(20);
+    expect(group?.duration).toBe(5);
+    expect(group?.statusSegments).toEqual([{ status: "Em andamento", count: 10 }, { status: "Concluída", count: 10 }]);
+    const filtered = activityTimeline(entries.filter(e => e.status === "Concluída"), "week")?.groups[0];
+    expect(filtered?.itemCount).toBe(10);
+    expect(filtered?.statusSegments).toEqual([{ status: "Concluída", count: 10 }]);
+    expect(activityTimeline(entries.map(e => ({ ...e, deletedAt: "2026-10-29T00:44:00Z" })), "week")).toBeNull();
+  });
   it("counts macrotheme calendar days inclusively without summing overlapping activities", () => {
     const entry = demo.entries[0]; if (!entry) throw new Error("Missing fixture");
     const timeline = activityTimeline([
