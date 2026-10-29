@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
-import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
+import { applyMutation, DemoMutationQueue, employeeEntries, macrothemeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
 
 const state = (): ActivityState => {
   const snapshot: ActivityState = structuredClone(demo);
@@ -12,6 +12,26 @@ function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation
   return { id: "cmd-1", entryId: entry.id, expectedVersion: entry.version, actorId: "p-ana", draft: { ...entry, hours: 14 }, at: "2026-10-28T23:25:00Z", ...overrides };
 }
 describe("Activity tracking rules", () => {
+  it("allows observation to be omitted or empty when saving", () => {
+    for (const observation of [undefined, ""]) {
+      const s = state(); const m = mutation(s); m.draft.observation = observation;
+      expect(applyMutation(s, m).entries[0]?.observation).toBe("");
+    }
+  });
+  it("preserves optional observation changes in immutable audit snapshots", () => {
+    const s = state(); const m = mutation(s); m.draft.observation = "Aguardando validação do gestor.";
+    const next = applyMutation(s, m);
+    expect(next.entries[0]?.observation).toBe("Aguardando validação do gestor.");
+    expect(next.audit[0]?.before?.observation).toBe("");
+    m.draft.observation = "Outro texto";
+    expect(next.audit[0]?.after.observation).toBe("Aguardando validação do gestor.");
+  });
+  it("filters macrotheme within employee and manager scopes", () => {
+    const s = state();
+    expect(macrothemeEntries(employeeEntries(s.entries, "p-ana"), "m-controles").map(e => e.id)).toEqual(["l-001"]);
+    expect(macrothemeEntries(managerEntries(s, "p-mariana"), "m-controles").map(e => e.id)).toEqual(["l-001", "l-006"]);
+    expect(macrothemeEntries(employeeEntries(s.entries, "p-ana"), "all")).toHaveLength(4);
+  });
   it("saves the activity start and end in immutable audit snapshots", () => {
     const s = state(); const m = mutation(s);
     m.draft.startDate = "2026-10-22"; m.draft.endDate = "2026-11-05";

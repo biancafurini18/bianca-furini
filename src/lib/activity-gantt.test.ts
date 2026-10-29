@@ -4,6 +4,17 @@ import { activityTimeline } from "./activity-gantt";
 import { employeeEntries, managerEntries } from "./activity-tracking";
 
 describe("Activity Gantt", () => {
+  it("aggregates macrotheme span and exposes only its scoped activity children", () => {
+    const timeline = activityTimeline(managerEntries(demo, "p-mariana"), "week");
+    const group = timeline?.groups.find(g => g.themeId === "m-controles");
+    expect(group?.children.map(item => item.entry.id)).toEqual(["l-001", "l-006"]);
+    expect(group?.left).toBe(timeline?.position("2026-10-20"));
+    const child = group?.children.find(item => item.entry.id === "l-001");
+    expect(group?.width).toBeCloseTo(child?.width ?? -1);
+    const filtered = activityTimeline(employeeEntries(demo.entries, "p-ana").filter(e => e.themeId === "m-controles"), "week");
+    expect(filtered?.groups.map(g => g.themeId)).toEqual(["m-controles"]);
+    expect(filtered?.groups[0]?.children.map(item => item.entry.id)).toEqual(["l-001"]);
+  });
   it("uses the employee and manager scopes without adding other people's entries", () => {
     expect(activityTimeline(employeeEntries(demo.entries, "p-ana"), "week")?.entries.map(e => e.entry.id).sort()).toEqual(["l-001", "l-002", "l-003", "l-004"]);
     expect(activityTimeline(managerEntries(demo, "p-mariana"), "week")?.entries.map(e => e.entry.id).sort()).toEqual(["l-001", "l-002", "l-003", "l-004", "l-005", "l-006"]);
