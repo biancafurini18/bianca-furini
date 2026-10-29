@@ -1,5 +1,5 @@
 # Activity tracking
-- [ ] Simplify table details access, align filters and modernize Gantt with soft macrotheme bars and total days; verify both views.
+- [x] Simplify table details access, align filters and modernize Gantt with soft macrotheme bars and total days; verify both views.
 - [x] Add optional observation, separate hierarchy columns and macrotheme filter, and expandable macrotheme Gantt; verify both views.
 - [x] Add activity start/end dates and a filtered Gantt at the bottom of employee and manager views; verify dates, audit and layout.
 - [x] Lighten both activity tables, remove demonstration copy, and enforce period-only fractional hours; verify.
