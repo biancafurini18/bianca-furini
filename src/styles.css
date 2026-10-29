@@ -116,6 +116,8 @@
   --table-green: oklch(0.50 0.13 150);
   --table-coral: oklch(0.52 0.18 28);
   --table-amber: oklch(0.52 0.12 70);
+  --gantt-summary: oklch(0.76 0.046 210);
+  --gantt-summary-edge: oklch(0.56 0.072 210);
 
   /* Efeitos do design system */
   --gradient-hero: radial-gradient(
@@ -162,6 +164,16 @@
 
 .activity-table tbody tr:hover {
   background-color: var(--table-hover);
+}
+
+.activity-gantt-summary {
+  background-color: var(--gantt-summary);
+  border: 1px solid var(--gantt-summary-edge);
+  border-bottom-width: 3px;
+}
+
+.activity-gantt-summary:hover {
+  background-color: color-mix(in oklab, var(--gantt-summary) 85%, var(--table-surface));
 }
 
 @layer base {
