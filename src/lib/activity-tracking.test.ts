@@ -14,7 +14,9 @@ function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation
 describe("Activity tracking rules", () => {
   it("allows observation to be omitted or empty when saving", () => {
     for (const observation of [undefined, ""]) {
-      const s = state(); const m = mutation(s); m.draft.observation = observation;
+      const s = state(); const m = mutation(s);
+      if (observation === undefined) delete m.draft.observation;
+      else m.draft.observation = observation;
       expect(applyMutation(s, m).entries[0]?.observation).toBe("");
     }
   });
