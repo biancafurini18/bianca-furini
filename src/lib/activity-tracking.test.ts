@@ -1,14 +1,40 @@
 import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
-import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, type ActivityState, type Mutation } from "./activity-tracking";
+import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
 
-const state = (): ActivityState => structuredClone(demo);
+const state = (): ActivityState => {
+  const snapshot: ActivityState = structuredClone(demo);
+  return snapshot;
+};
 function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation {
   const entry = s.entries[0];
   if (!entry) throw new Error("Fixture missing");
   return { id: "cmd-1", entryId: entry.id, expectedVersion: entry.version, actorId: "p-ana", draft: { ...entry, hours: 14 }, at: "2026-10-28T23:25:00Z", ...overrides };
 }
 describe("Activity tracking rules", () => {
+  it("saves the activity start and end in immutable audit snapshots", () => {
+    const s = state(); const m = mutation(s);
+    m.draft.startDate = "2026-10-22"; m.draft.endDate = "2026-11-05";
+    const next = applyMutation(s, m);
+    expect(next.entries[0]?.startDate).toBe("2026-10-22");
+    expect(next.entries[0]?.endDate).toBe("2026-11-05");
+    expect(next.audit[0]?.before?.startDate).toBe("2026-10-20");
+    expect(next.audit[0]?.after.endDate).toBe("2026-11-05");
+    m.draft.endDate = "2026-11-06";
+    expect(next.audit[0]?.after.endDate).toBe("2026-11-05");
+  });
+  it("rejects an end before the start without changing state", () => {
+    const s = state(); const m = mutation(s);
+    m.draft.startDate = "2026-11-06"; m.draft.endDate = "2026-11-05";
+    expect(() => applyMutation(s, m)).toThrow("anterior ao início");
+    expect(s.audit).toHaveLength(0);
+  });
+  it("requires valid calendar dates for both ends of the period", () => {
+    for (const [start, end] of [["", "2026-11-06"], ["2026-10-20", ""], ["2026-02-30", "2026-11-06"], ["2026-10-20", "2026-13-01"]]) {
+      expect(() => validateActivityPeriod(start ?? "", end ?? "")).toThrow("válidos");
+    }
+    expect(() => validateActivityPeriod("2026-11-06", "2026-11-06")).not.toThrow();
+  });
   it("accepts fractional hours only with a period and displays the same separator", () => {
     expect(parseHours("2.5")).toBe(2.5);
     expect(parseHours("12.75")).toBe(12.75);
