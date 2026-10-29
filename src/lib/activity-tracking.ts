@@ -7,12 +7,13 @@ export type Entry = {
   id: string; frontId: string; themeId: string; activityId: string;
   status: string; origin: string; type: string; deadline: string; startDate: string; endDate: string;
   responsibleIds: string[]; description: string; observation?: string; hours: number; managerIds: string[];
-  version: number; createdAt: string; updatedAt: string;
+  version: number; createdAt: string; updatedAt: string; deletedAt?: string;
 };
-export type Audit = { id: string; mutationId: string; entryId: string; actorId: string; action: "create" | "update"; at: string; before: Entry | null; after: Entry };
+export type Audit = { id: string; mutationId: string; entryId: string; actorId: string; action: "create" | "update" | "delete"; at: string; before: Entry | null; after: Entry };
 export type ActivityState = { people: Person[]; fronts: Front[]; themes: Theme[]; activities: Activity[]; entries: Entry[]; audit: Audit[] };
-export type Draft = Omit<Entry, "id" | "version" | "createdAt" | "updatedAt" | "managerIds">;
+export type Draft = Omit<Entry, "id" | "version" | "createdAt" | "updatedAt" | "managerIds" | "deletedAt">;
 export type Mutation = { id: string; entryId: string; expectedVersion: number | null; actorId: string; draft: Draft; at: string; catalog?: { front?: Front; theme?: Theme; activity?: Activity } };
+export type DeleteMutation = { id: string; entryId: string; expectedVersion: number; actorId: string; at: string };
 
 export const normalizeName = (name: string) => name.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
 export const formatHours = (hours: number) => hours.toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 2 });
@@ -31,9 +32,9 @@ export function parseHours(value: string): number {
   }
   return Number(value);
 }
-export const employeeEntries = (entries: Entry[], employeeId: string) => entries.filter(e => e.responsibleIds.includes(employeeId));
+export const employeeEntries = (entries: Entry[], employeeId: string) => entries.filter(e => !e.deletedAt && e.responsibleIds.includes(employeeId));
 export const macrothemeEntries = (entries: Entry[], themeId: string) => themeId === "all" ? entries : entries.filter(e => e.themeId === themeId);
-export const managerEntries = (state: ActivityState, managerId: string) => state.entries.filter(e => e.responsibleIds.some(id => state.people.some(p => p.id === id && p.managerId === managerId)));
+export const managerEntries = (state: ActivityState, managerId: string) => state.entries.filter(e => !e.deletedAt && e.responsibleIds.some(id => state.people.some(p => p.id === id && p.managerId === managerId)));
 export const managerIdsFor = (people: Person[], ids: string[]) => [...new Set(people.filter(p => ids.includes(p.id) && p.managerId).flatMap(p => p.managerId ? [p.managerId] : []))];
 export const isOverdue = (entry: Entry, today: string) => entry.deadline < today && entry.status !== "Concluída" && entry.status !== "Suspensa";
 export function totals(entries: Entry[], today: string) {
@@ -44,6 +45,7 @@ export function totals(entries: Entry[], today: string) {
 export function applyMutation(state: ActivityState, mutation: Mutation): ActivityState {
   if (state.audit.some(log => log.mutationId === mutation.id)) return state;
   const existing = state.entries.find(e => e.id === mutation.entryId);
+  if (existing?.deletedAt) throw new Error("Esta atividade foi excluída. Atualize a visualização.");
   const actor = state.people.find(p => p.id === mutation.actorId);
   if (!actor || actor.role !== "employee" || (existing && !existing.responsibleIds.includes(actor.id))) throw new Error("Você não pode alterar esta atividade.");
   if (!mutation.draft.responsibleIds.includes(actor.id)) throw new Error("O responsável atual deve permanecer no lançamento.");
@@ -76,6 +78,18 @@ export function applyMutation(state: ActivityState, mutation: Mutation): Activit
   const after: Entry = { ...draft, description: draft.description.trim(), observation: draft.observation?.trim() ?? "", responsibleIds: [...new Set(draft.responsibleIds)], id: mutation.entryId, managerIds: managerIdsFor(state.people, draft.responsibleIds), version: (existing?.version ?? 0) + 1, createdAt: existing?.createdAt ?? mutation.at, updatedAt: mutation.at };
   const audit: Audit = { id: `log-${mutation.id}`, mutationId: mutation.id, entryId: after.id, actorId: actor.id, action: existing ? "update" : "create", at: mutation.at, before: existing ? structuredClone(existing) : null, after: structuredClone(after) };
   return { ...state, fronts, themes, activities, entries: existing ? state.entries.map(e => e.id === after.id ? after : e) : [after, ...state.entries], audit: [...state.audit, audit] };
+}
+
+export function applyDeletion(state: ActivityState, mutation: DeleteMutation): ActivityState {
+  if (state.audit.some(log => log.mutationId === mutation.id)) return state;
+  const existing = state.entries.find(e => e.id === mutation.entryId);
+  const actor = state.people.find(p => p.id === mutation.actorId);
+  if (!existing || !actor || actor.role !== "employee" || !existing.responsibleIds.includes(actor.id)) throw new Error("Você não pode excluir esta atividade.");
+  if (existing.deletedAt) throw new Error("Esta atividade já foi excluída.");
+  if (existing.version !== mutation.expectedVersion) throw new Error("Esta atividade foi alterada. Feche e abra o lançamento novamente para revisar a versão atual.");
+  const after: Entry = { ...structuredClone(existing), version: existing.version + 1, updatedAt: mutation.at, deletedAt: mutation.at };
+  const audit: Audit = { id: `log-${mutation.id}`, mutationId: mutation.id, entryId: existing.id, actorId: actor.id, action: "delete", at: mutation.at, before: structuredClone(existing), after: structuredClone(after) };
+  return { ...state, entries: state.entries.map(e => e.id === existing.id ? after : e), audit: [...state.audit, audit] };
 }
 
 // One browser session only; never a substitute for the durable Databricks queue.

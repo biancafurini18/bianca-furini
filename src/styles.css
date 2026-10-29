@@ -167,13 +167,21 @@
 }
 
 .activity-gantt-summary {
-  background-color: var(--gantt-summary);
-  border: 1px solid var(--gantt-summary-edge);
+  background-color: var(--table-surface);
+  border: 1px solid var(--table-border);
   border-bottom-width: 3px;
 }
 
+.activity-gantt-summary > span {
+  opacity: 0.65;
+}
+
 .activity-gantt-summary:hover {
-  background-color: color-mix(in oklab, var(--gantt-summary) 85%, var(--table-surface));
+  background-color: var(--table-surface);
+}
+
+.activity-gantt-summary:hover > span {
+  opacity: 0.85;
 }
 
 @layer base {

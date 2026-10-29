@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Clock3, ListChecks, CircleAlert, CheckCircle2, Plus, Search, Pencil, Users, ClipboardList, BarChart3, Construction, ArrowUpRight } from "lucide-react";
+import { Clock3, ListChecks, CircleAlert, CheckCircle2, Plus, Search, Pencil, Trash2, Users, ClipboardList, BarChart3, Construction, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import demo from "@/data/activity-demo.json";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { ActivitySelect } from "./ActivitySelect";
 import { ActivityStatus } from "./ActivityStatus";
 import { ActivityForm } from "./ActivityForm";
 import { ActivityGantt } from "./ActivityGantt";
-import { applyMutation, macrothemeEntries, employeeEntries, managerEntries, normalizeName, totals, isOverdue, DemoMutationQueue, formatHours, type ActivityState, type Entry, type Mutation } from "@/lib/activity-tracking";
+import { applyDeletion, applyMutation, macrothemeEntries, employeeEntries, managerEntries, normalizeName, totals, isOverdue, DemoMutationQueue, formatHours, type ActivityState, type Entry, type Mutation } from "@/lib/activity-tracking";
 
 const number = (value: number) => value.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 const date = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR");
@@ -25,6 +25,8 @@ export function ActivityWorkspace() {
   const [themeFilter, setThemeFilter] = useState("all");
   const [form, setForm] = useState<{ entry: Entry | null } | null>(null);
   const [history, setHistory] = useState<Entry | null>(null);
+  const [deleting, setDeleting] = useState<Entry | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const [today, setToday] = useState("");
   useEffect(() => { const now = new Date(); setToday(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`); }, []);
   const personName = (id: string) => state.people.find(p => p.id === id)?.name ?? "—";
@@ -42,6 +44,19 @@ export function ActivityWorkspace() {
       const next = applyMutation(currentState.current, mutation);
       currentState.current = next; setState(next);
     }); toast.success("Lançamento salvo.");
+  }
+  async function removeEntry() {
+    if (!deleting || deleteBusy) return;
+    const mutation = { id: crypto.randomUUID(), entryId: deleting.id, expectedVersion: deleting.version, actorId: employeeId, at: new Date().toISOString() };
+    setDeleteBusy(true);
+    try {
+      await queue.current.enqueue(() => {
+        const next = applyDeletion(currentState.current, mutation);
+        currentState.current = next; setState(next);
+      });
+      setDeleting(null); toast.success("Atividade excluída.");
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Não foi possível excluir a atividade."); }
+    finally { setDeleteBusy(false); }
   }
   const metrics = [
     { label: "Esforço em horas", value: `${formatHours(summary.hours)} h`, icon: Clock3, color: "text-b3-turquesa" },
@@ -78,17 +93,17 @@ export function ActivityWorkspace() {
         <div className="activity-table overflow-x-auto rounded-lg border border-border border-t-2 border-t-b3-turquesa bg-background text-foreground">
           <table className="w-full min-w-[1180px] text-left text-[13px]">
             <thead className="border-b-2 border-border bg-muted text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{["Frente", "Macrotema", "Atividade", ...(view === "manager" ? ["Responsáveis"] : []), "Status", "Origem / Tipo", "Período · Início / Fim", "Prazo", "Horas", ...(view === "entry" ? ["Ações"] : [])].map((title, i) => <th key={i} className="px-3 py-2.5 font-semibold">{title}</th>)}</tr></thead>
-            <tbody>{rows.map(entry => <tr key={entry.id} className="border-b border-border last:border-0 hover:bg-accent">
+            <tbody>{rows.map(entry => <tr key={entry.id} tabIndex={0} aria-label={`Detalhes de ${state.activities.find(a => a.id === entry.activityId)?.name}`} onClick={() => setHistory(entry)} onKeyDown={event => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); setHistory(entry); } }} className="cursor-pointer border-b border-border last:border-0 hover:bg-accent focus-visible:outline-2 focus-visible:outline-b3-turquesa focus-visible:-outline-offset-2">
               <td className="max-w-40 px-3 py-2.5 text-[11px] text-muted-foreground">{state.fronts.find(f => f.id === entry.frontId)?.name}</td>
               <td className="max-w-44 px-3 py-2.5 text-xs font-medium">{state.themes.find(t => t.id === entry.themeId)?.name}</td>
-              <td className="max-w-64 px-3 py-2.5"><Button variant="link" className="h-auto max-w-full justify-start whitespace-normal p-0 text-left text-xs font-semibold text-foreground decoration-b3-turquesa underline-offset-4" aria-label={`Detalhes de ${state.activities.find(a => a.id === entry.activityId)?.name}`} onClick={() => setHistory(entry)}>{state.activities.find(a => a.id === entry.activityId)?.name}</Button></td>
+              <td className="max-w-64 px-3 py-2.5 text-xs font-semibold">{state.activities.find(a => a.id === entry.activityId)?.name}</td>
               {view === "manager" && <td className="max-w-44 px-3 py-2.5 text-[11px]">{entry.responsibleIds.map(id => <div key={id} className="mb-0.5">{personName(id)}</div>)}</td>}
               <td className="px-3 py-2.5"><ActivityStatus status={entry.status} /></td>
               <td className="px-3 py-2.5 text-[11px]"><div>{entry.origin}</div><div className="text-muted-foreground">{entry.type}</div></td>
               <td className="whitespace-nowrap px-3 py-2.5 text-[11px]"><div>{date(entry.startDate)}</div><div className="text-muted-foreground">até {date(entry.endDate)}</div></td>
               <td className={`whitespace-nowrap px-3 py-2.5 text-[11px] ${today && isOverdue(entry, today) ? "text-b3-coral" : "text-muted-foreground"}`}>{date(entry.deadline)}{today && isOverdue(entry, today) && <div className="font-semibold">Vencido</div>}</td>
               <td className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold tabular-nums">{formatHours(entry.hours)} h</td>
-              {view === "entry" && <td className="px-2 py-2.5"><Button variant="ghost" size="icon" className="size-7" aria-label={`Editar ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Editar lançamento" onClick={() => setForm({ entry })}><Pencil className="size-3.5 text-b3-turquesa" /></Button></td>}
+              {view === "entry" && <td className="px-2 py-2.5"><div className="flex items-center gap-1"><Button variant="ghost" size="icon" className="size-7" aria-label={`Editar ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Editar lançamento" onClick={event => { event.stopPropagation(); setForm({ entry }); }}><Pencil className="size-3.5 text-b3-turquesa" /></Button><Button variant="ghost" size="icon" className="size-7" aria-label={`Excluir ${state.activities.find(a => a.id === entry.activityId)?.name}`} title="Excluir atividade" onClick={event => { event.stopPropagation(); setDeleting(entry); }}><Trash2 className="size-3.5 text-b3-coral" /></Button></div></td>}
             </tr>)}</tbody>
           </table>
           {!rows.length && <div className="p-12 text-center"><ClipboardList className="mx-auto mb-3 size-8 text-muted-foreground" /><p className="font-semibold">Nenhum lançamento encontrado</p><Button variant="link" onClick={() => { setSearch(""); setFrontFilter("all"); setThemeFilter("all"); setStatusFilter("all"); setPersonFilter("all"); }}>Limpar filtros <ArrowUpRight /></Button></div>}
@@ -99,6 +114,7 @@ export function ActivityWorkspace() {
       <TabsContent value="dashboard"><div className="flex min-h-80 flex-col items-center justify-center border-b border-border py-16 text-center"><Construction className="mb-5 size-12 text-b3-turquesa" strokeWidth={1.3} /><h2 className="font-display text-2xl font-semibold">Dashboard em construção</h2><p className="mt-3 text-sm text-muted-foreground">Acompanhamento das Atividades</p></div></TabsContent>
     </Tabs>
     {form && <ActivityForm state={state} employeeId={employeeId} entry={form.entry} onClose={() => setForm(null)} onSave={save} />}
+    <Dialog open={Boolean(deleting)} onOpenChange={open => { if (!open && !deleteBusy) setDeleting(null); }}><DialogContent className="max-w-md rounded-lg"><DialogHeader><DialogTitle>Excluir atividade?</DialogTitle><DialogDescription>{state.activities.find(a => a.id === deleting?.activityId)?.name}</DialogDescription></DialogHeader><p className="text-sm text-muted-foreground">O lançamento será removido da tabela e do Gantt para todos os responsáveis. O registro de alterações será preservado.</p><div className="flex justify-end gap-2"><Button variant="outline" disabled={deleteBusy} onClick={() => setDeleting(null)}>Cancelar</Button><Button variant="destructive" disabled={deleteBusy} onClick={removeEntry}><Trash2 className="size-4" />{deleteBusy ? "Excluindo…" : "Excluir atividade"}</Button></div></DialogContent></Dialog>
     <Dialog open={Boolean(history)} onOpenChange={open => { if (!open) setHistory(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-lg"><DialogHeader><DialogTitle>Detalhes e histórico</DialogTitle><DialogDescription>{state.activities.find(a => a.id === history?.activityId)?.name}</DialogDescription></DialogHeader>{history && <><div className="text-sm"><span className="text-xs text-muted-foreground">Descrição</span><p className="mt-1 whitespace-pre-wrap leading-relaxed">{history.description || "—"}</p></div><div className="grid gap-3 border-y border-border py-4 text-sm sm:grid-cols-2"><div><span className="text-xs text-muted-foreground">Responsáveis</span><p className="mt-1">{history.responsibleIds.map(personName).join(" · ")}</p></div><div><span className="text-xs text-muted-foreground">Gestores</span><p className="mt-1">{history.managerIds.map(personName).join(" · ")}</p></div><div><span className="text-xs text-muted-foreground">Período da atividade</span><p className="mt-1">{date(history.startDate)} → {date(history.endDate)}</p></div><div><span className="text-xs text-muted-foreground">Prazo</span><p className="mt-1">{date(history.deadline)}</p></div></div><div className="text-sm"><span className="text-xs text-muted-foreground">Observação</span><p className="mt-1 whitespace-pre-wrap">{history.observation || "—"}</p></div><h3 className="font-semibold">Registro de alterações</h3>{!logs.length ? <p className="text-sm text-muted-foreground">Nenhuma alteração registrada.</p> : <div className="space-y-4">{logs.map(log => <div key={log.id} className="border-l-2 border-b3-turquesa pl-4"><div className="text-sm font-semibold">{log.action === "create" ? "Lançamento criado" : "Lançamento atualizado"} · versão {log.after.version}</div><p className="mt-1 text-xs text-muted-foreground">{personName(log.actorId)} · {new Date(log.at).toLocaleString("pt-BR")}</p><dl className="mt-2 space-y-1 text-xs">{(Object.keys(log.after) as (keyof Entry)[]).filter(key => !["id", "version", "updatedAt", "createdAt"].includes(key) && JSON.stringify(log.before?.[key]) !== JSON.stringify(log.after[key])).map(key => <div key={key} className="break-words"><dt className="inline font-semibold">{({ frontId: "Frente", themeId: "Macrotema", activityId: "Atividade", status: "Status", origin: "Origem", type: "Tipo", startDate: "Início da atividade", endDate: "Fim da atividade", deadline: "Prazo", responsibleIds: "Responsáveis", description: "Descrição", observation: "Observação", hours: "Horas", managerIds: "Gestores" } as Record<string, string>)[key]}: </dt><dd className="inline text-muted-foreground">{JSON.stringify(log.before?.[key] ?? "—")} → {JSON.stringify(log.after[key])}</dd></div>)}</dl></div>)}</div>}</>}</DialogContent></Dialog>
   </>;
 }

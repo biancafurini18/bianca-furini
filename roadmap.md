@@ -1,4 +1,5 @@
 # Activity tracking
+- [x] Open details from any table cell, add audited deletion, and show status-colored macrotheme bars with item/day totals; verified with 30 tests and employee/manager browser flows.
 - [x] Simplify table details access, align filters and modernize Gantt with soft macrotheme bars and total days; verify both views.
 - [x] Add optional observation, separate hierarchy columns and macrotheme filter, and expandable macrotheme Gantt; verify both views.
 - [x] Add activity start/end dates and a filtered Gantt at the bottom of employee and manager views; verify dates, audit and layout.
