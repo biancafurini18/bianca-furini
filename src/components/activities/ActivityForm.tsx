@@ -17,7 +17,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
   onSave: (mutation: Mutation) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Draft>(entry ? { ...entry, responsibleIds: [...entry.responsibleIds] } : {
-    frontId: "", themeId: "", activityId: "", status: "Não iniciada", origin: "Planejada", type: "Pontual", deadline: "", startDate: "", endDate: "", responsibleIds: [employeeId], description: "", hours: 0,
+    frontId: "", themeId: "", activityId: "", status: "Não iniciada", origin: "Planejada", type: "Pontual", deadline: "", startDate: "", endDate: "", responsibleIds: [employeeId], description: "", observation: "", hours: 0,
   });
   const [newFront, setNewFront] = useState<string | null>(null);
   const [hoursInput, setHoursInput] = useState(entry ? formatHours(entry.hours) : "");
@@ -82,6 +82,7 @@ export function ActivityForm({ state, employeeId, entry, onClose, onSave }: {
             <Field label="Responsáveis *"><div className="space-y-3">{state.people.filter(p => p.role === "employee").map(p => <label key={p.id} className="flex items-center gap-2 text-sm"><Checkbox aria-label={p.name} checked={draft.responsibleIds.includes(p.id)} disabled={p.id === employeeId} onCheckedChange={checked => field("responsibleIds", checked ? [...draft.responsibleIds, p.id] : draft.responsibleIds.filter(id => id !== p.id))} /><span>{p.name}{p.id === employeeId && <span className="ml-2 text-xs text-b3-turquesa">Você</span>}</span></label>)}</div></Field>
             <Field label="Gestor · automático"><div className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm"><UserRound className="mt-0.5 size-4 shrink-0 text-b3-turquesa" /><span>{managerNames || "—"}</span></div></Field>
             <Field label="Descrição (resumo) *" wide><Textarea aria-label="Descrição (resumo)" value={draft.description} onChange={e => field("description", e.target.value)} required maxLength={2000} rows={3} placeholder="Resumo da iniciativa" /></Field>
+            <Field label="Observação (opcional)" wide><Textarea aria-label="Observação" value={draft.observation ?? ""} onChange={e => field("observation", e.target.value)} rows={2} /></Field>
           </div>
         </fieldset>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}

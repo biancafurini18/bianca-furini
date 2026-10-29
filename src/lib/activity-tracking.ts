@@ -6,7 +6,7 @@ export const statuses = ["Não iniciada", "Em andamento", "Concluída", "Suspens
 export type Entry = {
   id: string; frontId: string; themeId: string; activityId: string;
   status: string; origin: string; type: string; deadline: string; startDate: string; endDate: string;
-  responsibleIds: string[]; description: string; hours: number; managerIds: string[];
+  responsibleIds: string[]; description: string; observation?: string; hours: number; managerIds: string[];
   version: number; createdAt: string; updatedAt: string;
 };
 export type Audit = { id: string; mutationId: string; entryId: string; actorId: string; action: "create" | "update"; at: string; before: Entry | null; after: Entry };
@@ -32,6 +32,7 @@ export function parseHours(value: string): number {
   return Number(value);
 }
 export const employeeEntries = (entries: Entry[], employeeId: string) => entries.filter(e => e.responsibleIds.includes(employeeId));
+export const macrothemeEntries = (entries: Entry[], themeId: string) => themeId === "all" ? entries : entries.filter(e => e.themeId === themeId);
 export const managerEntries = (state: ActivityState, managerId: string) => state.entries.filter(e => e.responsibleIds.some(id => state.people.some(p => p.id === id && p.managerId === managerId)));
 export const managerIdsFor = (people: Person[], ids: string[]) => [...new Set(people.filter(p => ids.includes(p.id) && p.managerId).flatMap(p => p.managerId ? [p.managerId] : []))];
 export const isOverdue = (entry: Entry, today: string) => entry.deadline < today && entry.status !== "Concluída" && entry.status !== "Suspensa";
@@ -72,7 +73,7 @@ export function applyMutation(state: ActivityState, mutation: Mutation): Activit
     activities.push(catalog.activity);
   }
   if (!fronts.some(f => f.id === draft.frontId) || !themes.some(t => t.id === draft.themeId && t.frontId === draft.frontId) || !activities.some(a => a.id === draft.activityId && a.themeId === draft.themeId)) throw new Error("Selecione uma frente, um macrotema e uma atividade relacionados.");
-  const after: Entry = { ...draft, description: draft.description.trim(), responsibleIds: [...new Set(draft.responsibleIds)], id: mutation.entryId, managerIds: managerIdsFor(state.people, draft.responsibleIds), version: (existing?.version ?? 0) + 1, createdAt: existing?.createdAt ?? mutation.at, updatedAt: mutation.at };
+  const after: Entry = { ...draft, description: draft.description.trim(), observation: draft.observation?.trim() ?? "", responsibleIds: [...new Set(draft.responsibleIds)], id: mutation.entryId, managerIds: managerIdsFor(state.people, draft.responsibleIds), version: (existing?.version ?? 0) + 1, createdAt: existing?.createdAt ?? mutation.at, updatedAt: mutation.at };
   const audit: Audit = { id: `log-${mutation.id}`, mutationId: mutation.id, entryId: after.id, actorId: actor.id, action: existing ? "update" : "create", at: mutation.at, before: existing ? structuredClone(existing) : null, after: structuredClone(after) };
   return { ...state, fronts, themes, activities, entries: existing ? state.entries.map(e => e.id === after.id ? after : e) : [after, ...state.entries], audit: [...state.audit, audit] };
 }
