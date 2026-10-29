@@ -16,5 +16,12 @@ export function activityTimeline(entries: Entry[], scale: GanttScale) {
     key: format(day, "yyyy-MM-dd"), label: format(day, scale === "week" ? "dd MMM" : "MMM yyyy", { locale: ptBR }),
     left: differenceInCalendarDays(day, start) / days * 100,
   }));
-  return { start, end, days, buckets, position, entries: scheduled.map(entry => ({ entry, left: position(entry.startDate), width: (differenceInCalendarDays(parseISO(entry.endDate), parseISO(entry.startDate)) + 1) / days * 100, duration: differenceInCalendarDays(parseISO(entry.endDate), parseISO(entry.startDate)) + 1 })) };
+  const items = scheduled.map(entry => ({ entry, left: position(entry.startDate), width: (differenceInCalendarDays(parseISO(entry.endDate), parseISO(entry.startDate)) + 1) / days * 100, duration: differenceInCalendarDays(parseISO(entry.endDate), parseISO(entry.startDate)) + 1 }));
+  const groups = [...new Set(scheduled.map(entry => entry.themeId))].map(themeId => {
+    const children = items.filter(item => item.entry.themeId === themeId);
+    const left = Math.min(...children.map(item => item.left));
+    const right = Math.max(...children.map(item => item.left + item.width));
+    return { themeId, left, width: right - left, children };
+  });
+  return { start, end, days, buckets, position, entries: items, groups };
 }
