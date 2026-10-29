@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import demo from "@/data/activity-demo.json";
 import { applyMutation, DemoMutationQueue, employeeEntries, managerEntries, normalizeName, totals, parseHours, formatHours, validateActivityPeriod, type ActivityState, type Mutation } from "./activity-tracking";
 
-const state = (): ActivityState => structuredClone(demo);
+const state = (): ActivityState => {
+  const snapshot: ActivityState = structuredClone(demo);
+  return snapshot;
+};
 function mutation(s: ActivityState, overrides: Partial<Mutation> = {}): Mutation {
   const entry = s.entries[0];
   if (!entry) throw new Error("Fixture missing");

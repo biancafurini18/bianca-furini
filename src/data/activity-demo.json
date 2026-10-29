@@ -1,5 +1,6 @@
 {
   "demonstration": true,
+  "schemaVersion": 2,
   "currentEmployeeId": "p-ana",
   "currentManagerId": "p-mariana",
   "people": [
