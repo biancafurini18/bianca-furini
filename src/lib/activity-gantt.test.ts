@@ -4,6 +4,15 @@ import { activityTimeline } from "./activity-gantt";
 import { employeeEntries, managerEntries } from "./activity-tracking";
 
 describe("Activity Gantt", () => {
+  it("counts macrotheme calendar days inclusively without summing overlapping activities", () => {
+    const entry = demo.entries[0]; if (!entry) throw new Error("Missing fixture");
+    const timeline = activityTimeline([
+      { ...entry, id: "first", startDate: "2026-10-20", endDate: "2026-10-25" },
+      { ...entry, id: "second", startDate: "2026-10-23", endDate: "2026-10-28" },
+    ], "week");
+    expect(timeline?.groups[0]?.duration).toBe(9);
+    expect(timeline?.groups[0]?.children.map(item => item.duration)).toEqual([6, 6]);
+  });
   it("aggregates macrotheme span and exposes only its scoped activity children", () => {
     const timeline = activityTimeline(managerEntries(demo, "p-mariana"), "week");
     const group = timeline?.groups.find(g => g.themeId === "m-controles");

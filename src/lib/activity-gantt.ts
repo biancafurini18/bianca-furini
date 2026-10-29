@@ -21,7 +21,10 @@ export function activityTimeline(entries: Entry[], scale: GanttScale) {
     const children = items.filter(item => item.entry.themeId === themeId);
     const left = Math.min(...children.map(item => item.left));
     const right = Math.max(...children.map(item => item.left + item.width));
-    return { themeId, left, width: right - left, children };
+    const firstDate = children.reduce((min, item) => item.entry.startDate < min ? item.entry.startDate : min, children[0]?.entry.startDate ?? "");
+    const lastDate = children.reduce((max, item) => item.entry.endDate > max ? item.entry.endDate : max, children[0]?.entry.endDate ?? "");
+    const duration = differenceInCalendarDays(parseISO(lastDate), parseISO(firstDate)) + 1;
+    return { themeId, left, width: right - left, duration, children };
   });
   return { start, end, days, buckets, position, entries: items, groups };
 }
